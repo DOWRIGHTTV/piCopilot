@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+## SYS it up
+update-rc.d copilotSystemDaemon defaults
+update-rc.d copilotWifiDaemon defaults
+service copilotSystemDaemon start
+
+## Deal with supervisor
+systemctl start supervisor
+
+## Make autohappen
+systemctl enable copilotSystemDaemon
+systemctl enable supervisor

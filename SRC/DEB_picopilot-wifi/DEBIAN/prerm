@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+pip2 uninstall packetEssentials -y
+pip2 uninstall pbkdf2 -y
+pip2 uninstall pyDot11 -y
+pip2 uninstall pycryptodomex -y
+pip2 uninstall rc4 -y
+pip2 uninstall scapy -y
+
+pip3 uninstall packetEssentials -y
+pip3 uninstall pbkdf2 -y
+pip3 uninstall pyDot11 -y
+pip3 uninstall pycryptodomex -y
+pip3 uninstall rc4 -y
+pip3 uninstall scapy -y

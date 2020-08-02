@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.ico') }}">
+        <title>
+            Telemetry Bridge Configuration
+        </title>
+    </head>
+
+
+    <body>
+        <form action={{ url_for('telemetry.telemetrySet') }} method = "POST">
+            GCS IP:
+            </br>
+            <input id="gcsIP" type="text" name="gcsIP" required>
+            </br>
+            </br>
+            <input type="submit" value="Generate Configuration File">
+            </br>
+        </form>
+        </br>
+        </br>
+        <a href={{ url_for('telemetry.index') }}>
+            <button>
+                Click here to return to Telemetry menu
+            </button>
+        </a>
+        <a href={{ url_for('index') }} style="position:absolute; bottom:10px; left:10px;">
+            <button>
+                Click here to return to Main menu
+            </button>
+        </a>
+    </body>
+</html>
