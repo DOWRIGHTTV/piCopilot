@@ -1,5 +1,5 @@
 # piCopilot
-piCopilot is an ecosystem for autonomous workflows with any portable system that is Debian based.  This means piCopilot is perfect for a device like the Raspberry Pi.  It has been tailored for the world of unmanned Intelligence, Surveillance and Reconnaissance.
+Tailored for the world of unmanned Intelligence, Surveillance and Reconnaissance.
 
 piCopilot is 100% feedback driven.  If you like piCopilot and wish to contribute, simply fork and PR.
 
