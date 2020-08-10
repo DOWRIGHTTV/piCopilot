@@ -1,6 +1,4 @@
 # piCopilot
-Tailored for the world of unmanned Intelligence, Surveillance and Reconnaissance.
-
 piCopilot is 100% feedback driven.  If you like piCopilot and wish to contribute, simply fork and PR.
 
 Certain aspects of piCopilot may not be legal in every Country or locality.  Ensure that you check the rules and regulations for where you will be operating prior to use.  The operator is fully and wholly responsible for any legal and/or civil issues that may arise from their usage of piCopilot.
@@ -18,7 +16,7 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
   * WiFi meta-package for piCopilot
 
 ### Getting started
-1. Create image for a Raspberry Pi
+1. Create an image for a Raspberry Pi
     - Refer to notes in RELEASE
     - Burn the image
     - Boot the Raspberry Pi
@@ -100,3 +98,12 @@ chown -R postgres /opt/piCopilot-idrop/logs
     - Choose the example json in kickstart/IDS_Example.json
     - Import
         - Example data should now be visible
+
+### Ready to go
+The Raspberry Pi in front of you is now a fully functional autonomous assistant.  In its current configuration it will connect to the Wireless Access Point it was previously connected to.  To revert to HostAPD mode reverse the step listed in the second bullet of step 3 and reboot.
+
+### Contacting support
+For help with any of the steps or to inquire how piCopilot can support your integration needs for unmanned systems, please contact us via email:
+```
+support [at] configitnow.com
+```
