@@ -7,7 +7,6 @@ import signal
 import sys
 from easyThread import Backgrounder
 from lib.dbControl import Builder
-from lib.scout import Scout
 from lib.unifier import Unify
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
@@ -119,8 +118,6 @@ def main(args):
         ## Create the snarf instance that holds the database
         if args.m == 'k9' or args.m == 'listen':
             snarf = Snarf(cap, unity, pArgs)
-        if args.m == 'ids':
-            snarf = Scout(cap, unity)
 
         ## Active sniffing
         if args.r is None:

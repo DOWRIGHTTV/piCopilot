@@ -102,6 +102,9 @@ chown -R postgres /opt/piCopilot-idrop/logs
 ### Ready to go
 The Raspberry Pi in front of you is now a fully functional autonomous assistant.  In its current configuration it will connect to the Wireless Access Point it was previously connected to.  To revert to HostAPD mode reverse the step listed in the second bullet of step 3 and reboot.
 
+### Known bug(s)
+There exists a bug when trying to download the postgresql logs.  The workaround for the time being is down run kExporter and then grab the logs from /opt/piCopilot-idrop/logs/.
+
 ### Contacting support
 For help with any of the steps or to inquire how piCopilot can support your integration needs for unmanned systems, please contact us via email:
 ```

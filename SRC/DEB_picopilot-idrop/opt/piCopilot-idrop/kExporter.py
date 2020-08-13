@@ -9,7 +9,6 @@ import signal
 import sys
 from easyThread import Backgrounder
 from lib.dbControl import Builder
-from lib.scout import Scout
 from lib.unifier import Unify
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
@@ -93,3 +92,6 @@ with open('/opt/piCopilot-idrop/logs/pipes.csv', 'w') as oFile:
     csv_out.writerow(hdrs)
     for row in pipeList:
         csv_out.writerow(row)
+
+## cleanup
+con.close()
