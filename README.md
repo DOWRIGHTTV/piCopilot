@@ -27,13 +27,19 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
     - The password is piCopilotAP
 
 3. Connecting piCopilot to the Internet.
+    - piCopilot wants to be on a 192.168.10.254/24
+    - DO NOT PROCEED PAST STEP 4 WITHOUT SWITCHING BACK TO 192.168.10.254/24
     - Modify /etc/wpa_supplicant/wpa_supplicant.conf accordingly
     - Remove the # in /etc/network/interfaces.d/wlan0
     - Give /etc/resolv.conf a nameserver
 
-4. Setup piCopilot-idrop
-    - wget https://github.com/stryngs/piCopilot
-    - dpkg -i piCopilot/DEBs/picopilot-idrop_0.4.2_all.deb
+4. Prep easy-thread, packetEssentials and idrop
+    - git clone https://github.com/stryngs/easy-thread.git
+    - ```python -m pip install easy-thread/easy-thread-*.tar.gz```
+    - git clone https://github.com/stryngs/packetEssentials.git
+    - ```python -m pip install packetEssentials/RESOURCEs/packetEssentials-*.tar.gz```
+    - git clone https://github.com/stryngs/piCopilot.git
+    - dpkg -i piCopilot/DEBs/picopilot-idrop_*.deb
     - shutdown
     - power on
 
@@ -68,11 +74,7 @@ mkdir /opt/piCopilot-idrop/logs
 chown -R postgres /opt/piCopilot-idrop/logs
 ```
 
-7. Prep threading, packetEssentials and Grafana
-    - git clone https://github.com/stryngs/easy-thread
-    - ```python -m pip install easy-thread/easy-thread-*.tar.gz```
-    - git clone https://github.com/stryngs/packetEssentials
-    - ```python -m pip install packetEssentials/RESOURCEs/packetEssentials-*.tar.gz```
+7. Prep Grafana
     - Modify /etc/supervisor/conf.d/kSnarfPsql.conf accordingly
     - Proceed to http://192.168.10.254:8001/
     - Select idrop
@@ -104,6 +106,9 @@ The Raspberry Pi in front of you is now a fully functional autonomous assistant.
 
 ### Known bug(s)
 There exists a bug when trying to download the postgresql logs.  The workaround for the time being is down run kExporter and then grab the logs from /opt/piCopilot-idrop/logs/.
+
+### Up next
+A new .img with all of the aforementioned steps pre-ran.  Keep an eye out for it soon!
 
 ### Contacting support
 For help with any of the steps or to inquire how piCopilot can support your integration needs for unmanned systems, please contact us via email:
