@@ -176,9 +176,8 @@ def main(args):
 
 if __name__ == '__main__':
     ## ARGUMENT PARSING
-    parser = argparse.ArgumentParser(description = 'airpwn-ng - the new and improved 802.11 packet injector')
+    parser = argparse.ArgumentParser(description = 'kBlue')
     group = parser.add_mutually_exclusive_group(required = True)
-
     group.add_argument('--sqlite',
                        action = 'store_true',
                        help = 'kBlue sqlite3 mode')
