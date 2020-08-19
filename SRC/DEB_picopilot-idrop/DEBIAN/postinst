@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+## chown for postgres
+chown -R postgres /opt/piCopilot-idrop/logs
+
 ## Start supervisor daemon
 systemctl start supervisor
 systemctl enable supervisor

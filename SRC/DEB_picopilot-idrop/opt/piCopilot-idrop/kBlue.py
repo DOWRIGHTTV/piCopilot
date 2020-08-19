@@ -2,17 +2,11 @@
 
 """
 Temporary integration meld for kBlue to idrop
-
-Grab bluetooth packets from an ubertooth, drop into scapy and do something...
-
-mkfifo is SLOW! >> dont do this prior to running ubettooth-btle:
-    mkfifo /tmp/bluesPipe
-
-ubertooth-btle -f -q /mnt/usb_storage/bluesPipe
 """
 
 import argparse
 import netaddr
+import os
 import re
 import time
 import signal
@@ -20,6 +14,7 @@ import sqlite3 as lite
 import sys
 import psycopg2
 from scapy.all import *
+from subprocess import Popen
 
 def crtlC(args):
     """Handle CTRL+C."""
@@ -93,8 +88,6 @@ def pgsqlFilter(db, dbName):
                 pNoise = packet[BTLE_RF].noise
 
                 ## sqlite3 table INSERT
-                print(tStamp,tMac,pSignal,pNoise)
-
                 db.execute("""
                                     INSERT INTO blue (epoch,
                                                       pi_timestamp,
@@ -130,6 +123,102 @@ def timer():
     return epoch, lDate, lTime
 
 
+# def seenTest(self, packet):
+#     """Gather essential identifiers for "have I seen this packet" test
+#
+#     Return False to continue with this test.  "seenTest", if not seen,
+#     then continue
+#
+#     Will return False if the delta of now and previous timestamp
+#     for a given frame are > self.unity.seenMaxTimer {Default 30 seconds},
+#     otherwise we ignore, and thus by ignoring, we do not clog up the logs
+#
+#     Create a table, and store this data so we can query on the fly
+#         - only with psql
+#     """
+#     try:
+#         p = (packet[Dot11].subtype,
+#              packet[Dot11].type,
+#              packet[Dot11].FCfield,
+#              packet[Dot11].addr1,
+#              packet[Dot11].addr2,
+#              packet[Dot11].addr3,
+#              packet[Dot11].addr4)
+#
+#         ## Figure out if this combo has been seen before
+#         if p not in self.unity.seenDict:
+#             self.unity.seenDict.update({p: (1, time.time())})
+#             #print ('PASS TIMER')
+#
+#             ## Add if psql
+#             if self.unity.args.psql is True:
+#                 pType = self.unity.PE.conv.symString(packet[Dot11], 'type')
+#                 subType = self.subParser(packet)
+#                 fcField = self.unity.PE.conv.symString(packet[Dot11], 'FCfield')
+#                 try:
+#                     self.cap.db.execute("""
+#                                         INSERT INTO uniques (pid,
+#                                                              epoch,
+#                                                              pi_timestamp,
+#                                                              date,
+#                                                              time,
+#                                                              type,
+#                                                              subtype,
+#                                                              FCfield,
+#                                                              addr1,
+#                                                              addr2,
+#                                                              addr3,
+#                                                              addr4)
+#                                                      VALUES (%s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s,
+#                                                              %s);
+#                                         """, (self.unity.logDict.get('total'),
+#                                               self.unity.epoch,
+#                                               str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+#                                               self.unity.lDate,
+#                                               self.unity.lTime,
+#                                               pType,
+#                                               subType,
+#                                               fcField,
+#                                               packet.addr1,
+#                                               packet.addr2,
+#                                               packet.addr3,
+#                                               packet.addr4))
+#                 except Exception as E:
+#                     print (E)
+#
+#             return False
+#
+#         ## Has been seen, now check time
+#         else:
+#             lastTime = self.unity.seenDict.get(p)[1]
+#             lastCount = self.unity.seenDict.get(p)[0]
+#             if (time.time() - lastTime) > self.unity.seenMaxTimer:
+#
+#                 ## Update delta timestamp
+#                 self.unity.seenDict.update({p: (lastCount + 1, time.time())})
+#
+#                 ### Should pass this information along to a DB for consumption `p` analysis wise
+#
+#
+#                 #print ('PASS TIMER')
+#                 return False
+#             else:
+#                 #print ('FAIL TIMER')
+#                 return True
+#     except:
+#         pass
+
+
 def sqliteFilter(db, dbName):
     def snarf(packet):
         if packet.haslayer(BTLE_ADV_NONCONN_IND):
@@ -161,6 +250,9 @@ def sqliteFilter(db, dbName):
 def main(args):
     ## Do some filtering to ignore parsing we don't need
     onlyCare()
+    pipeSleep = 20
+    availPipes = ['/mnt/usb_storage/bluesPipe-1',
+                  '/mnt/usb_storage/bluesPipe-2']
 
     ## Connect to the db
     if args.sqlite is True:
@@ -169,12 +261,21 @@ def main(args):
     else:
         con, db, dbName = pgsqlPrep()
         PRN = pgsqlFilter(db, dbName)
-    p = sniff(offline = '/mnt/usb_storage/bluesPipe', prn = PRN)
-    con.commit()
+
+    while True:
+        for pipe in availPipes:
+            print('sniffing pipe {0}'.format(pipe))
+            pipePush(pipe, pipeSleep)
+            p = sniff(offline = '{0}'.format(pipe), prn = PRN)                  ## need to thread and move on.
+            time.sleep(.1)
     con.close()
 
 
+def pipePush(pipe, sVal):
+    bPipe = os.system('/usr/bin/timeout {0} /usr/bin/ubertooth-btle -f -q {1} 1>/dev/null'.format(sVal, pipe))
+
 if __name__ == '__main__':
+
     ## ARGUMENT PARSING
     parser = argparse.ArgumentParser(description = 'kBlue')
     group = parser.add_mutually_exclusive_group(required = True)

@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 import os
 from flask import current_app
@@ -21,7 +21,7 @@ def index():
                                system_Mode = 'None',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_logSize = sh.logSize(),
-                               query_Exports = os.system('/opt/piCopilot-idrop/kExporter.py'),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'k9':
         return render_template('index.html',
@@ -29,7 +29,7 @@ def index():
                                system_Mode = sh.rlCheck('k9'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_logSize = sh.logSize(),
-                               query_Exports = os.system('/opt/piCopilot-idrop/kExporter.py'),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'kSnarfSqlite':
         return render_template('index.html',
@@ -37,7 +37,7 @@ def index():
                                system_Mode = sh.rlCheck('kSnarfSqlite'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_logSize = sh.logSize(),
-                               query_Exports = os.system('/opt/piCopilot-idrop/kExporter.py'),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'kSnarfPsql':
         return render_template('index.html',
@@ -45,7 +45,7 @@ def index():
                                system_Mode = sh.rlCheck('kSnarfPsql'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_logSize = sh.logSize(),
-                               query_Exports = os.system('/opt/piCopilot-idrop/kExporter.py'),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'Off':
         return render_template('index.html',
@@ -53,7 +53,7 @@ def index():
                                system_Mode = 'Off',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_logSize = sh.logSize(),
-                               query_Exports = os.system('/opt/piCopilot-idrop/kExporter.py'),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 ###############################################################################
 

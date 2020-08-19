@@ -5,7 +5,7 @@ class Main(object):
 
     def __init__(self, dbInstance, unity, wireless = True):
         if unity.args.z:
-            print 'main.Main instantiated'
+            print('main.Main instantiated')
         self.unity = unity
         self.cap = dbInstance
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import argparse
 import logging
@@ -14,18 +14,18 @@ from scapy.all import *
 def crtlC(cap, unity):
     """Handle CTRL+C."""
     def tmp(signal, frame):
-        print '\nTrying to stop gracefully'
+        print('\nTrying to stop gracefully')
         #cap.con.commit()
         cap.con.close()
         try:
             unity.conBeat.close()
         except:
             print('Could not close heartbeat connection')
-        print 'Packets logged:\n'
+        print('Packets logged:\n')
         for k, v in unity.logDict.items():
-            print '%s       -- %s' % (k, v)
+            print('%s       -- %s' % (k, v))
         if unity.args.m != 'ids':
-            print 'uniques       -- {0}\n'.format(len(unity.seenDict))
+            print('uniques       -- {0}\n'.format(len(unity.seenDict)))
 
         ## Unload tuples for visual comfort
         if unity.args.psql is True and unity.args.m == 'ids':
@@ -48,21 +48,21 @@ def main(args):
     if args.m is not None:
         if args.m == 'k9' and args.t is None:
             if args.m == 'k9' and args.k is None:
-                print 'Mode k9 requires -t or -k\n'
+                print('Mode k9 requires -t or -k\n')
                 sys.exit(1)
         if args.m == 'listen' and args.t:
-            print 'Targeted functionality not currently implemented for listen mode\n'
+            print('Targeted functionality not currently implemented for listen mode\n')
             sys.exit(1)
     if args.i is None and args.d is None and args.q is None:
-        print '-i OR -d -OR- -q must be selected\n'
+        print('-i OR -d -OR- -q must be selected\n')
         sys.exit(1)
     if args.i is not None and args.m is None:
-        print '-i must be used with -m'
+        print('-i must be used with -m')
         sys.exit(1)
 
     ## Deal with DB query
     if args.q is not None:
-        print 'DB Querying not implemented yet\n'
+        print('DB Querying not implemented yet\n')
         sys.exit(1)
 
     ## Proceed with snarfing
@@ -131,7 +131,7 @@ def main(args):
                         wList = iFile.read().splitlines()
                     unity.wSet = set()
                     for i in wList:
-                        print type(unity)
+                        print(type(unity))
                         unity.wSet.add(i.lower().strip())
                         unity.wSet = iFile.read().splitlines()
                     unity.wSet.discard('')

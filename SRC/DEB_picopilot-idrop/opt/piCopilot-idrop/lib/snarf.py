@@ -121,14 +121,13 @@ class Snarf(object):
                     self.handlerMain(packet)
 
                     ## Notify
-                    print 'SNARF!! %s traffic detected!' % tName
+                    print('SNARF!! {0} traffic detected!'.format(tName))
                     notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
                     try:
                         fSig = -(256 - int(notDecoded[self.unity.offset + 3], 16))
                     except IndexError:
                         fSig = ''
-                    print 'RSSI: %s' % fSig
-                    print '\n'
+                    print('RSSI: {0}\n'.format(fSig))
 
                     ## Timestamp
                     self.unity.times()
@@ -150,14 +149,13 @@ class Snarf(object):
 
 
                     ## Notify
-                    print 'SNARF!! %s traffic detected!' % tName
+                    print('SNARF!! {0} traffic detected!'.format(tName))
                     notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
                     try:
                         fSig = -(256 - int(notDecoded[self.unity.offset + 3], 16))
                     except IndexError:
                         fSig = ''
-                    print 'RSSI: %s' % fSig
-                    print '\n'
+                    print('RSSI: %s\n'.format(fSig))
 
                     ## Timestamp
                     self.unity.times()
@@ -246,7 +244,7 @@ class Snarf(object):
                             self.unity.logUpdate('iterCount')
                             if self.unity.logDict.get('iterCount') == 1000:
                                 #self.cap.con.commit()
-                                print 'Total packets logged: %s' % self.unity.logDict.get('total')
+                                print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
                                 self.unity.logDict.update({'iterCount': 0})
                         else:
                             return
@@ -267,7 +265,7 @@ class Snarf(object):
                         self.unity.logUpdate('iterCount')
                         if self.unity.logDict.get('iterCount') == 1000:
                             #self.cap.con.commit()
-                            print 'Total packets logged: %s' % self.unity.logDict.get('total')
+                            print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
                             self.unity.logDict.update({'iterCount': 0})
                     else:
                         return
@@ -395,7 +393,7 @@ class Snarf(object):
                             self.unity.logUpdate('iterCount')
                             if self.unity.logDict.get('iterCount') == 1000:
                                 #self.cap.con.commit()
-                                print 'Total packets logged: %s' % self.unity.logDict.get('total')
+                                print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
                                 self.unity.logDict.update({'iterCount': 0})
                         else:
                             return
@@ -414,7 +412,7 @@ class Snarf(object):
                         ## stdouts
                         self.unity.logUpdate('iterCount')
                         if self.unity.logDict.get('iterCount') == 1000:
-                            print 'Total packets logged: %s' % self.unity.logDict.get('total')
+                            print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
                             self.unity.logDict.update({'iterCount': 0})
                     else:
                         return
@@ -437,7 +435,7 @@ class Snarf(object):
             self.pCount += 1
             self.tCount += 1
             if self.pCount == 100:
-                print '%s frames logged' % self.tCount
+                print('{0} frames logged'.format(self.tCount))
                 self.pCount = 0
         return snarf
 

@@ -48,10 +48,10 @@ class Builder(object):
                     elif self.dFile == 'N':
                         exit(1)
                     else:
-                        print '\nUpdating %s and continuing' % self.dbName
+                        print('\nUpdating {0} and continuing'.format(self.dbName))
 
             ## Build the DB if not already created
-            print 'Proceeding to build %s\n' % self.dbName
+            print('Proceeding to build {0}\n'.format(self.dbName))
             self.con = lite.connect(self.dbName, isolation_level = None)
             self.con.text_factory = str
             self.db = self.con.cursor()
