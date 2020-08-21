@@ -35,17 +35,19 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
 
 4. Prep easy-thread, packetEssentials and idrop
     - git clone https://github.com/stryngs/easy-thread.git
-    - ```python -m pip install easy-thread/easy-thread-*.tar.gz```
     - git clone https://github.com/stryngs/packetEssentials.git
-    - ```python -m pip install packetEssentials/RESOURCEs/packetEssentials-*.tar.gz```
     - git clone https://github.com/stryngs/piCopilot.git
-    - dpkg -i piCopilot/DEBs/picopilot-idrop_*.deb
+    - ```python3 -m pip install easy-thread/easy-thread-*.tar.gz```
+    - ```python3 -m pip install packetEssentials/RESOURCEs/packetEssentials-*.tar.gz```
+    - ```dpkg -i piCopilot/DEBs/picopilot-scripts_*.deb```
+    - ```dpkg -i piCopilot/DEBs/picopilot-idrop_*.deb```
+    - ```apt-get install python3-netaddr```
     - shutdown
     - power on
 
 5. Verify piCopilot-idrop is running and setup external USB NIC for 802.11
     - Ports 8001 and 9001 should now be in use
-    - Plug in usb nic
+    - Plug in USB NIC
     - Open a browser and proceed to http://192.168.10.254:8001/
     - Select NIC prep
     - The system will shutdown
@@ -70,8 +72,6 @@ CREATE DATABASE idrop;
 GRANT pg_write_server_files TO root;
 crtl+d
 exit
-mkdir /opt/piCopilot-idrop/logs
-chown -R postgres /opt/piCopilot-idrop/logs
 ```
 
 7. Prep Grafana
@@ -101,11 +101,30 @@ chown -R postgres /opt/piCopilot-idrop/logs
     - Import
         - Example data should now be visible
 
+### kBlue setup (Optional)
+1. Prepare a USB thumbdrive of ideally at least 8GB in size split evenly on the partitions.
+    - /dev/sda1 should be swap
+    - /dev/sda2 should be ext4
+
+2. Install the needed packages for the Ubertooth integration
+    - ```apt-get install libbtbb-dev libubertooth-dev ubertooth```
+
+3. Setup /etc/fstab for mounts
+    - ```mkdir -p /mnt/usb_storage```
+    - ```echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab```
+    - ```echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab```
+
+4. Final steps
+    - Power down the Raspberry Pi
+    - Plugin USB drive and ubertooth
+    - Power on the Raspberry Pi
+
+
 ### Ready to go
 The Raspberry Pi in front of you is now a fully functional autonomous assistant.  In its current configuration it will connect to the Wireless Access Point it was previously connected to.  To revert to HostAPD mode reverse the step listed in the second bullet of step 3 and reboot.
 
 ### Known bug(s)
-There exists a bug when trying to download the postgresql logs.  The workaround for the time being is down run kExporter and then grab the logs from /opt/piCopilot-idrop/logs/.
+None at this time.
 
 ### Up next
 A new .img with all of the aforementioned steps pre-ran.  Keep an eye out for it soon!

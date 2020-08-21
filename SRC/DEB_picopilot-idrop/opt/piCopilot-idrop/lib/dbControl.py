@@ -72,6 +72,7 @@ class Builder(object):
                         self.db.execute('DROP TABLE IF EXISTS main;')
                         self.db.execute('DROP TABLE IF EXISTS probes;')
                         self.db.execute('DROP TABLE IF EXISTS uniques;')
+                        self.db.execute('DROP TABLE IF EXISTS blue;')
                         self.con.close()
                         print('Tables dropped\n  [+] Exiting\n')
                         sys.exit(0)

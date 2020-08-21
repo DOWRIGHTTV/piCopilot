@@ -4,7 +4,7 @@ from scapy.all import *
 dParser = dicts.Dicts()
 
 class Request(object):
-    """Adds DHCP Request entries to a pre-existing sqlite3/psql database"""
+    """Adds DHCP Request entries to a pre-existing sqlite3/pgsql database"""
     def __init__(self, dbInstance, unity):
         self.cap = dbInstance
         self.unity = unity

@@ -3,7 +3,7 @@ from lib.child_modules.dhcp import request
 from scapy.all import *
 
 class Dhcp(object):
-    """Handles all aspects of DHCP"""
+    """Handles all aspects of DHCP for 802.11"""
 
     def __init__(self, dbInstance, unity):
         self.unity = unity

@@ -3,7 +3,7 @@ from lib.child_modules.probes import response
 from scapy.all import *
 
 class Probes(object):
-    """Handles all aspects of Probes"""
+    """Handles all aspects of Probes for 802.11"""
 
     def __init__(self, dbInstance, unity):
         self.unity = unity

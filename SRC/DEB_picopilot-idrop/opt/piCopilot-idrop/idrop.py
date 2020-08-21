@@ -7,6 +7,7 @@ from flask import render_template
 from lib.shared import Shared
 from lib.web.system import SYSTEM
 from lib.web.query import QUERY
+from lib.web.blue import BLUE
 
 
 app = Flask(__name__)
@@ -17,6 +18,7 @@ def index():
 
     if sh.sysMode == 'None':
         return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
                                system_Service = sh.sysMode,
                                system_Mode = 'None',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
@@ -25,6 +27,7 @@ def index():
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'k9':
         return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
                                system_Service = sh.sysMode,
                                system_Mode = sh.rlCheck('k9'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
@@ -33,6 +36,7 @@ def index():
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'kSnarfSqlite':
         return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
                                system_Service = sh.sysMode,
                                system_Mode = sh.rlCheck('kSnarfSqlite'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
@@ -41,6 +45,7 @@ def index():
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'kSnarfPsql':
         return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
                                system_Service = sh.sysMode,
                                system_Mode = sh.rlCheck('kSnarfPsql'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
@@ -49,6 +54,7 @@ def index():
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'Off':
         return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
                                system_Service = sh.sysMode,
                                system_Mode = 'Off',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
@@ -85,10 +91,14 @@ if __name__ == '__main__':
     queryClass = QUERY(sh)
     query = queryClass.query
 
+    blueClass = BLUE(sh)
+    blue = blueClass.blue
+
 
     ## Register children
     app.register_blueprint(system)
     app.register_blueprint(query)
+    app.register_blueprint(blue)
 
 
     ## Launch app
