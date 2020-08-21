@@ -61,6 +61,26 @@ def index():
                                query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+
+    if sh.sysMode == 'kBlue':
+        return render_template('index.html',
+                               kBlue_Service = sh.rlCheck('kBlue'),
+                               system_Service = sh.sysMode,
+                               system_Mode = sh.sysMode,
+                               system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
+                               query_logSize = sh.logSize(),
+                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+
+    ## Unexpected prep
+    return render_template('index.html',
+                           kBlue_Service = sh.rlCheck('kBlue'),
+                           system_Service = sh.sysMode,
+                           system_Mode = sh.sysMode,
+                           system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
+                           query_logSize = sh.logSize(),
+                           query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
+                           system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 ###############################################################################
 
 

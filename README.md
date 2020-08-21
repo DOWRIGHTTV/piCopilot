@@ -124,7 +124,7 @@ exit
 The Raspberry Pi in front of you is now a fully functional autonomous assistant.  In its current configuration it will connect to the Wireless Access Point it was previously connected to.  To revert to HostAPD mode reverse the step listed in the second bullet of step 3 and reboot.
 
 ### Known bug(s)
-None at this time.
+For the page on /, idrop Service can be confused by the presence of kBlue and how sh.sysMode is used.  When enabling kBlue and returning to the main menu, the idrop Service will now read as kBlue.  This will be worked out in later releases.  To force it proper, cycle the idrop service off and then back on.  It will correct by virtue of sh.sysMode flipping through the original idrop logic.
 
 ### Up next
 A new .img with all of the aforementioned steps pre-ran.  Keep an eye out for it soon!

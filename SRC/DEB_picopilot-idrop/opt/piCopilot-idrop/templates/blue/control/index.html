@@ -21,7 +21,7 @@
     </head>
     <body>
         <table id="myTable">
-            <form onsubmit="return atleast_oneselection(event)" action={{ url_for('system.serviceControl') }} method = "POST">
+            <form onsubmit="return atleast_oneselection(event)" action={{ url_for('blue.serviceControl') }} method = "POST">
                 kBlue Service:
                 <input type="submit" value="Change Status" style="position:absolute; left:150px; top:10px">
                 {% for choice in uChoice %}
@@ -34,7 +34,6 @@
                         </td>
                     </tr>
                 {% endfor %}
-
                 </br>
             </form>
         </table>

@@ -1,5 +1,5 @@
 Package: picopilot-idrop
-Version: 0.4.6
+Version: 0.4.7
 Architecture: all
 Depends: picopilot, picopilot-scripts
 Section: net

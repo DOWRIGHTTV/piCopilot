@@ -70,4 +70,4 @@ class BLUE(object):
                     # GPIO.output(23, GPIO.HIGH)
 
             return render_template('blue/index.html',
-                                   serviceStatus = self.sh.rlCheck(self.sh.sysMode))
+                                   kBlue_Service = sh.rlCheck('kBlue'))
