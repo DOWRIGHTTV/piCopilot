@@ -7,9 +7,10 @@ import time
 class Unify(object):
     """This class acts a singular point of contact for tracking purposes"""
 
-    def __init__(self, args, control = None):
-        if args.z:
-            print ('unifier.Unify instantiated')
+    def __init__(self, args, control = None, kBlue = None):
+        if kBlue is None:
+            if args.z:
+                print ('unifier.Unify instantiated')
         self.epoch = None
         self.lDate = None
         self.lTime = None
@@ -21,23 +22,28 @@ class Unify(object):
         ## make args avail
         self.args = args
 
-        ## Grab the OS control object
-        self.control = control
+        ## idrop only
+        if kBlue is None:
 
-        if args.m != 'ids':
-            ## Set the driver
-            self.iwDriver = self.args.d
+            ## Grab the OS control object
+            self.control = control
+            if args.m != 'ids':
+                ## Set the driver
+                self.iwDriver = self.args.d
 
-            ## Notate driver offset
-            self.PE = PE
-            self.offset = self.PE.drv.drivers(self.iwDriver)
+                ## Notate driver offset
+                self.PE = PE
+                self.offset = self.PE.drv.drivers(self.iwDriver)
 
-        ## Packet logs
-        self.logDict = {'ids': 0,
-                        'iterCount': 0,
-                        'dhcp': 0,
-                        'probes': 0,
-                        'total': 0}
+            ## Packet logs
+            self.logDict = {'ids': 0,
+                            'iterCount': 0,
+                            'dhcp': 0,
+                            'probes': 0,
+                            'total': 0}
+        ## kBlue usage
+        else:
+            self.logDict = {'blue': 0}
 
         ## Setup base
         self.baseDir = os.getcwd()
@@ -51,12 +57,6 @@ class Unify(object):
             oui = re.findall('(.*)\s+\(hex\)\s+(.*)', i)
             if len(oui) == 1:
                 self.ouiDict.update({oui[0][0].replace('-', ':').lower().strip(): oui[0][1]})
-        if args.z:
-            print(len(self.ouiDict))
-            for k, v in self.ouiDict.items():
-                print(k)
-                print(v)
-
         print ('OUIs loaded\n')
 
         ## Set whitelist
@@ -64,9 +64,7 @@ class Unify(object):
 
 
     def macGrab(self, addr):
-        """Defines the OUI for a given MAC
-        This function serves as an example, it is not ready for implementation
-        """
+        """Last ditch effort if outDict{} does not have the OUI"""
         try:
             parsed_oui = netaddr.EUI(addr)
             return parsed_oui.oui.registration().org
@@ -87,8 +85,8 @@ class Unify(object):
         """
         ### This converts to Wireshark style
         #int(wepCrypto.endSwap('0x' + p.byteRip(f.notdecoded[8:], qty = 8, compress = True)), 16)
-        self.epoch = int(time.time())                                          ## Store the epoch in UTC
-        self.lDate = time.strftime('%Y-%m-%d', time.localtime())               ## Store the date in local tz
-        self.lTime = time.strftime('%H:%M:%S', time.localtime())               ## Store the time in local tz
+        self.epoch = time.time()                                          ## Store the epoch in UTC
+        self.lDate = time.strftime('%Y-%m-%d', time.localtime(self.epoch))               ## Store the date in local tz
+        self.lTime = time.strftime('%H:%M:%S', time.localtime(self.epoch))               ## Store the time in local tz
         self.origStamp = self.origTime
         self.timeMarker = self.epoch

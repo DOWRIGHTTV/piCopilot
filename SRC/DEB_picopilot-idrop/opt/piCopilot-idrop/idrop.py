@@ -5,10 +5,10 @@ from flask import current_app
 from flask import Flask
 from flask import render_template
 from lib.shared import Shared
+from lib.unifier import Unify
 from lib.web.system import SYSTEM
 from lib.web.query import QUERY
 from lib.web.blue import BLUE
-
 
 app = Flask(__name__)
 
@@ -102,7 +102,6 @@ def nicPrep():
 if __name__ == '__main__':
     ## Setup
     sh = Shared()
-    # app = Flask(__name__)
 
     ## Instantiate needed classes
     systemClass = SYSTEM(sh)
@@ -122,4 +121,4 @@ if __name__ == '__main__':
 
 
     ## Launch app
-    app.run(debug = True, host = '0.0.0.0', port = 8001, threaded = True)
+    app.run(debug = False, host = '0.0.0.0', port = 8001, threaded = True)

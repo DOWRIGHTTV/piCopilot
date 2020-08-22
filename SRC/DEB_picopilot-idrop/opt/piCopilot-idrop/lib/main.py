@@ -17,7 +17,7 @@ class Main(object):
             if wireless is True:
                 self.cap.db.execute("""
                                     CREATE TABLE IF NOT EXISTS main(pid INTEGER,
-                                                                    epoch INTEGER,
+                                                                    epoch REAL,
                                                                     pi_timestamp TIMESTAMPTZ,
                                                                     date TEXT,
                                                                     time TEXT,
@@ -43,7 +43,7 @@ class Main(object):
             if wireless is True:
                 self.cap.db.execute("""
                                     CREATE TABLE IF NOT EXISTS main(pid INT,
-                                                                    epoch INT,
+                                                                    epoch REAL,
                                                                     pi_timestamp TIMESTAMPTZ,
                                                                     date TEXT,
                                                                     time TEXT,
@@ -135,7 +135,7 @@ class Main(object):
             o3 = self.unity.ouiDict.get(':'.join(packet.addr3.split(':')[0:3]))
         except:
             try:
-                o3 = self.unity.ouiDict.get(packet.addr3)
+                o3 = self.unity.macGrab(packet.addr3)
             except:
                 o3 = None
 
@@ -143,7 +143,7 @@ class Main(object):
             o4 = self.unity.ouiDict.get(':'.join(packet.addr4.split(':')[0:3]))
         except:
             try:
-                o4 = self.unity.ouiDict.get(packet.addr4)
+                o4 = self.unity.macGrab(packet.addr4)
             except:
                 o4 = None
 
@@ -175,7 +175,7 @@ class Main(object):
                                                         ?);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       o1,
@@ -240,7 +240,7 @@ class Main(object):
                                                      %s);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       o1,

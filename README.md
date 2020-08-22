@@ -127,6 +127,7 @@ The Raspberry Pi in front of you is now a fully functional autonomous assistant.
 For the page on /, idrop Service can be confused by the presence of kBlue and how sh.sysMode is used.  When enabling kBlue and returning to the main menu, the idrop Service will now read as kBlue.  This will be worked out in later releases.  To force it proper, cycle the idrop service off and then back on.  It will correct by virtue of sh.sysMode flipping through the original idrop logic.
 
 ### Up next
+OUI integrations for kBlue module.
 A new .img with all of the aforementioned steps pre-ran.  Keep an eye out for it soon!
 
 ### Contacting support

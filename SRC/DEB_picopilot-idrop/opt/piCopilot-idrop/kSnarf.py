@@ -38,8 +38,6 @@ def crtlC(cap, unity):
 
 def main(args):
 
-    ### This really needs some tooling around with, lots of possibilities here
-
     ## Non usage scenarios
     if args.m != 'ids':                                                         ## Might be a good pivot for menu sanity
         from lib.os_control import Control

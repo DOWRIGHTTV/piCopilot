@@ -25,7 +25,7 @@ class Response(object):
                                                                 ?);
                                     """, (self.unity.logDict.get('total'),
                                           self.unity.epoch,
-                                          str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+                                          str(self.unity.lDate) + ' ' + str(self.unity.lTime),
                                           self.unity.lDate,
                                           self.unity.lTime,
                                           self.unity.PE.sType.mgmtSubtype(packet.subtype),
@@ -59,7 +59,7 @@ class Response(object):
                                                         %s);
                                     """, (self.unity.logDict.get('total'),
                                           self.unity.epoch,
-                                          str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+                                          str(self.unity.lDate) + ' ' + str(self.unity.lTime),
                                           self.unity.lDate,
                                           self.unity.lTime,
                                           self.unity.PE.sType.mgmtSubtype(packet.subtype),

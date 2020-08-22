@@ -48,7 +48,7 @@ class Snarf(object):
         ## Track unique addr combos
         if unity.args.psql is True:
             self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pid INT,\
-                                                                    epoch INT,\
+                                                                    epoch REAL,\
                                                                     pi_timestamp TIMESTAMPTZ,\
                                                                     date TEXT,\
                                                                     time TEXT,\
@@ -334,7 +334,7 @@ class Snarf(object):
                                                                  %s);
                                             """, (self.unity.logDict.get('total'),
                                                   self.unity.epoch,
-                                                  str(self.unity.lDate) + ' ' + str(self.unity.lTime) + '-05',
+                                                  str(self.unity.lDate) + ' ' + str(self.unity.lTime),
                                                   self.unity.lDate,
                                                   self.unity.lTime,
                                                   pType,
@@ -357,10 +357,6 @@ class Snarf(object):
 
                     ## Update delta timestamp
                     self.unity.seenDict.update({p: (lastCount + 1, time.time())})
-
-                    ### Should pass this information along to a DB for consumption `p` analysis wise
-
-
                     #print ('PASS TIMER')
                     return False
                 else:
