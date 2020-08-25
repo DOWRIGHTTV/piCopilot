@@ -42,6 +42,13 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
     - A sample dashboard for idrop is waiting on you
 
 ### kBlue setup (Optional)
+Benchmark on Raspberry Pi 3 Model B+ as determined by [blRip.py](https://github.com/stryngs/workshops/blob/master/DC28/blRip.py) w/ no print:
+```
+$ python3 blRip.py
+Total time: 24.86375856399536
+Packets processed: 19235
+Packets per second: 773.6159418734769
+```
 1. Prepare a USB thumb-drive of ideally at least 8GB in size split evenly on the partitions.
     - /dev/sda1 should be swap
     - /dev/sda2 should be ext4
