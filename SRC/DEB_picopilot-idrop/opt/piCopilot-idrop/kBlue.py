@@ -32,28 +32,45 @@ class Blue(object):
         self.PRN = self.pgsqlFilter()
 
 
+    def choiceMaker(self, packet):
+        proceed = False
+        for choice in self.choices[:-4]:
+            if packet.haslayer(choice):
+                self.chosen = str(choice).split('.')[-1].split("'")[0]                ## Change logic before threading
+                return True
+        return False
+
+
     def onlyCare(self):
-        """Only load parsers for what we care about"""
-        q=[scapy.layers.bluetooth4LE.BTLE,
-           scapy.layers.bluetooth4LE.BTLE_RF,
-           scapy.layers.bluetooth4LE.BTLE_ADV,
-           scapy.layers.bluetooth4LE.EIR_Hdr,
-           scapy.layers.bluetooth4LE.BTLE_ADV_NONCONN_IND]
-        conf.layers.filter(q)
+        """Only load parsers for what we care about
+        self.choices[:-4] is the list of objects we rip from currently
+        """
+        self.choices = [scapy.layers.bluetooth4LE.BTLE_ADV_IND,
+                        scapy.layers.bluetooth4LE.BTLE_ADV_NONCONN_IND,
+                        scapy.layers.bluetooth4LE.BTLE_ADV_SCAN_IND,
+                        scapy.layers.bluetooth4LE.BTLE_SCAN_REQ,
+                        scapy.layers.bluetooth4LE.BTLE_SCAN_RSP,
+                        scapy.layers.bluetooth4LE.BTLE_ADV_DIRECT_IND,
+                        scapy.layers.bluetooth4LE.BTLE,
+                        scapy.layers.bluetooth4LE.BTLE_RF,
+                        scapy.layers.bluetooth4LE.BTLE_ADV,
+                        scapy.layers.bluetooth4LE.EIR_Hdr]
+        conf.layers.filter(self.choices)
 
 
     def pgsqlFilter(self):
         def snarf(packet):
-            if packet.haslayer(BTLE_ADV_NONCONN_IND):
+            epoch, lDate, lTime = self.timer()
+
+            ## Only test if known MAC field(s) exists
+            if self.choiceMaker(packet) is True:
 
                 ### THIS IS ENTRY POINT
                 if self.seenTest(packet) is False:
-                    ### CLEARED HOT TO LOG
 
-                    epoch, lDate, lTime = self.timer()
+                    ### CLEARED HOT TO LOG
                     tStamp = str(lDate) + ' ' + str(lTime)
                     try:
-                        tMac = packet[BTLE_ADV_NONCONN_IND].AdvA
                         pSignal = packet[BTLE_RF].signal
                         pNoise = packet[BTLE_RF].noise
 
@@ -63,7 +80,10 @@ class Blue(object):
                                                           pi_timestamp,
                                                           date,
                                                           time,
-                                                          mac,
+                                                          parent,
+                                                          adva,
+                                                          inita,
+                                                          scana,
                                                           signal,
                                                           noise)
                                                      VALUES (%s,
@@ -72,15 +92,20 @@ class Blue(object):
                                                              %s,
                                                              %s,
                                                              %s,
+                                                             %s,
+                                                             %s,
+                                                             %s,
                                                              %s);
                                                  """, (epoch,
-                                                       str(lDate) + ' ' + str(lTime),
+                                                       tStamp,
                                                        lDate,
                                                        lTime,
-                                                       tMac,
+                                                       self.bTuple[0],
+                                                       self.bTuple[1],
+                                                       self.bTuple[2],
+                                                       self.bTuple[3],
                                                        pSignal,
                                                        pNoise))
-
                     except Exception as E:
                         print(E)
         return snarf
@@ -100,7 +125,10 @@ class Blue(object):
                                                        pi_timestamp TIMESTAMPTZ,
                                                        date TEXT,
                                                        time TEXT,
-                                                       mac TEXT,
+                                                       parent TEXT,
+                                                       adva TEXT,
+                                                       inita TEXT,
+                                                       scana TEXT,
                                                        signal INT,
                                                        noise INT);
                        """)
@@ -127,40 +155,68 @@ class Blue(object):
         Create a table, and store this data so we can query on the fly
             - only with psql
         """
+        self.bTuple = None                                                      ## Rework if threading
         try:
-            p = (packet[BTLE_ADV_NONCONN_IND].AdvA,
-                 packet[BTLE_RF].signal,
-                 packet[BTLE_RF].noise)
+            if self.chosen == 'BTLE_ADV_IND':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_ADV_IND].AdvA,
+                               None,
+                               None)
+            if self.chosen == 'BTLE_ADV_NONCONN_IND':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_ADV_NONCONN_IND].AdvA,
+                               None,
+                               None)
+            if self.chosen == 'BTLE_ADV_SCAN_IND':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_ADV_SCAN_IND].AdvA,
+                               None,
+                               None,)
+            if self.chosen == 'BTLE_SCAN_REQ':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_SCAN_REQ].AdvA,
+                               None,
+                               packet[BTLE_SCAN_REQ].ScanA)
+            if self.chosen == 'BTLE_SCAN_RSP':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_SCAN_RSP].AdvA,
+                               None,
+                               None)
+            if self.chosen == 'BTLE_ADV_DIRECT_IND':
+                self.bTuple = (self.chosen,
+                               packet[BTLE_ADV_DIRECT_IND].AdvA,
+                               None,
+                               packet[BTLE_ADV_DIRECT_IND].InitA)
+        except Exception as E:
+            print(E)
 
-            ## Figure out if this combo has been seen before
-            if p not in self.unity.seenDict:
-                self.unity.seenDict.update({p: (1, time.time())})
-                #print ('PASS TIMER')
+        ## Figure out if this combo has been seen before
+        if self.bTuple is not None:
+            if self.bTuple not in self.unity.seenDict:
+                self.unity.seenDict.update({self.bTuple: (1, time.time())})
+
+                # print("I AM NOT FOUND")
                 return False
 
             ## Has been seen, now check time
             else:
-                lastTime = self.unity.seenDict.get(p)[1]
-                lastCount = self.unity.seenDict.get(p)[0]
+                lastTime = self.unity.seenDict.get(self.bTuple)[1]
+                lastCount = self.unity.seenDict.get(self.bTuple)[0]
                 if (time.time() - lastTime) > self.unity.seenMaxTimer:
 
                     ## Update delta timestamp
-                    self.unity.seenDict.update({p: (lastCount + 1, time.time())})
-                    #print ('PASS TIMER')
+                    self.unity.seenDict.update({self.bTuple: (lastCount + 1, time.time())})
+                    # print ('PASS TIMER')
                     return False
                 else:
-                    #print ('FAIL TIMER')
+                    # print ('FAIL TIMER')
                     return True
-        except:
-            pass
+
 
     def timer(self):
-
-
-
-        epoch = int(time.time())                                          ## Store the epoch in UTC
-        lDate = time.strftime('%Y-%m-%d', time.localtime())               ## Store the date in local tz
-        lTime = time.strftime('%H:%M:%S', time.localtime())               ## Store the time in local tz
+        epoch = int(time.time())                                                ## Store the epoch in UTC
+        lDate = time.strftime('%Y-%m-%d', time.localtime(epoch))                ## Store the date in local tz
+        lTime = time.strftime('%H:%M:%S', time.localtime(epoch))                ## Store the time in local tz
         return epoch, lDate, lTime
 
 

@@ -17,7 +17,7 @@ class Main(object):
             if wireless is True:
                 self.cap.db.execute("""
                                     CREATE TABLE IF NOT EXISTS main(pid INTEGER,
-                                                                    epoch REAL,
+                                                                    epoch INTEGER,
                                                                     pi_timestamp TIMESTAMPTZ,
                                                                     date TEXT,
                                                                     time TEXT,
@@ -43,7 +43,7 @@ class Main(object):
             if wireless is True:
                 self.cap.db.execute("""
                                     CREATE TABLE IF NOT EXISTS main(pid INT,
-                                                                    epoch REAL,
+                                                                    epoch INTEGER,
                                                                     pi_timestamp TIMESTAMPTZ,
                                                                     date TEXT,
                                                                     time TEXT,

@@ -48,7 +48,7 @@ class Snarf(object):
         ## Track unique addr combos
         if unity.args.psql is True:
             self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pid INT,\
-                                                                    epoch REAL,\
+                                                                    epoch INTEGER,\
                                                                     pi_timestamp TIMESTAMPTZ,\
                                                                     date TEXT,\
                                                                     time TEXT,\
