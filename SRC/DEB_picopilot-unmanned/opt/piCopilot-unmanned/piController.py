@@ -69,4 +69,4 @@ if __name__ == '__main__':
     app.register_blueprint(videoObj)
 
     ## Launch app
-    app.run(debug = True, host = '0.0.0.0', port = 8000, threaded = True)
+    app.run(debug = False, host = '0.0.0.0', port = 8000, threaded = True)

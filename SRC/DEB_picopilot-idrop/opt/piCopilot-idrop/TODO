@@ -1,3 +1,10 @@
+### News of the day
+port ignoreSet from kBlue to kSnarf
+
+Test filter() for kBlue and kSnarf
+
+
+### Older thoughts
 ## Add mutually exclusive groups for args
 
 ## Add reduction options

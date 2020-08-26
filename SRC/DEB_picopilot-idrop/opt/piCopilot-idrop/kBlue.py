@@ -13,24 +13,13 @@ import signal
 import sqlite3 as lite
 import sys
 import psycopg2
+from configparser import ConfigParser
 from lib.unifier import Unify
 from scapy.all import *
 from subprocess import Popen
 
-class Blue(object):
-    """Handle all things for bluetooth"""
-
-    def __init__(self, args):
-        ##Do some filtering to ignore parsing we don't need
-        self.onlyCare()
-        self.pipeSleep = 20
-        self.availPipes = ['/mnt/usb_storage/bluesPipe-1',
-                           '/mnt/usb_storage/bluesPipe-2']
-
-        ## Connect to the db
-        self.con, self.db, self.dbName = self.pgsqlPrep()
-        self.PRN = self.pgsqlFilter()
-
+class Blinder(object):
+    """Figure out whether or not to pay attention to a given bluetooth object"""
 
     def choiceMaker(self, packet):
         proceed = False
@@ -39,6 +28,189 @@ class Blue(object):
                 self.chosen = str(choice).split('.')[-1].split("'")[0]                ## Change logic before threading
                 return True
         return False
+
+    ### Move to a common library with snarf.py
+    def seenTest_ignore(self, packet):
+        """Gather essential identifiers for "have I seen this packet" test.
+
+        Return False to continue with this test.  If not seen, then continue.
+
+        Will return False if the delta of now and previous timestamp
+        for a given frame are > self.unity.seenMaxTimer {Default 30 seconds},
+        otherwise we ignore, and thus by ignoring, we do not clog up the logs.
+
+        Create a table, and store this data so we can query on the fly.
+            - only with psql
+        """
+        self.bTuple = self.tupleGen(packet)
+        if self.bTuple is not None:
+
+            ## ignore if needed
+            ### Add logic later to keep for parents with > 1 MAC per object
+            if set(i for i in self.bTuple[1:]) & self.ignoreSet:
+                # print('[+] ignoring: {0}'.format(set(i for i in self.bTuple[1:])))
+                return True
+            # else:
+                # print ('[-] not ignoring: {0}'.format(set(i for i in self.bTuple[1:])))
+
+            ## Figure out if this combo has been seen before
+            if self.bTuple is not None:
+                if self.bTuple not in self.unity.seenDict:
+                    self.unity.seenDict.update({self.bTuple: (1, time.time())})
+
+                    # print("I AM NOT FOUND")
+                    return False
+
+                ## Has been seen, now check time
+                else:
+                    lastTime = self.unity.seenDict.get(self.bTuple)[1]
+                    lastCount = self.unity.seenDict.get(self.bTuple)[0]
+                    if (time.time() - lastTime) > self.unity.seenMaxTimer:
+
+                        ## Update delta timestamp
+                        self.unity.seenDict.update({self.bTuple: (lastCount + 1, time.time())})
+                        # print ('PASS TIMER')
+                        return False
+                    else:
+                        # print ('FAIL TIMER')
+                        return True
+
+
+    ### Move to a common library with snarf.py
+    def seenTest_noignore(self, packet):
+        """Gather essential identifiers for "have I seen this packet" test.
+
+        Return False to continue with this test.  If not seen, then continue.
+
+        Will return False if the delta of now and previous timestamp
+        for a given frame are > self.unity.seenMaxTimer {Default 30 seconds},
+        otherwise we ignore, and thus by ignoring, we do not clog up the logs.
+
+        Create a table, and store this data so we can query on the fly.
+            - only with psql
+        """
+        self.bTuple = self.tupleGen(packet)
+        if self.bTuple is not None:
+
+            ## Figure out if this combo has been seen before
+            if self.bTuple is not None:
+                if self.bTuple not in self.unity.seenDict:
+                    self.unity.seenDict.update({self.bTuple: (1, time.time())})
+
+                    # print("I AM NOT FOUND")
+                    return False
+
+                ## Has been seen, now check time
+                else:
+                    lastTime = self.unity.seenDict.get(self.bTuple)[1]
+                    lastCount = self.unity.seenDict.get(self.bTuple)[0]
+                    if (time.time() - lastTime) > self.unity.seenMaxTimer:
+
+                        ## Update delta timestamp
+                        self.unity.seenDict.update({self.bTuple: (lastCount + 1, time.time())})
+                        # print ('PASS TIMER')
+                        return False
+                    else:
+                        # print ('FAIL TIMER')
+                        return True
+
+
+    def tupleGen(self, packet):
+        """Generate the unique tuple of a given bluetooth object"""
+        bTuple = None
+        try:
+            if self.chosen == 'BTLE_ADV_IND':
+                bTuple = (self.chosen,
+                          packet[BTLE_ADV_IND].AdvA,
+                          None,
+                          None)
+            if self.chosen == 'BTLE_ADV_NONCONN_IND':
+                bTuple = (self.chosen,
+                          packet[BTLE_ADV_NONCONN_IND].AdvA,
+                          None,
+                          None)
+            if self.chosen == 'BTLE_ADV_SCAN_IND':
+                bTuple = (self.chosen,
+                          packet[BTLE_ADV_SCAN_IND].AdvA,
+                          None,
+                          None,)
+            if self.chosen == 'BTLE_SCAN_REQ':
+                bTuple = (self.chosen,
+                          packet[BTLE_SCAN_REQ].AdvA,
+                          None,
+                          packet[BTLE_SCAN_REQ].ScanA)
+            if self.chosen == 'BTLE_SCAN_RSP':
+                bTuple = (self.chosen,
+                          packet[BTLE_SCAN_RSP].AdvA,
+                          None,
+                          None)
+            if self.chosen == 'BTLE_ADV_DIRECT_IND':
+                bTuple = (self.chosen,
+                          packet[BTLE_ADV_DIRECT_IND].AdvA,
+                          None,
+                          packet[BTLE_ADV_DIRECT_IND].InitA)
+            return bTuple
+        except Exception as E:
+            print(E)
+            return None
+
+
+
+class Blue(object):
+    """Handle all things for bluetooth"""
+
+    def __init__(self, args, blinder):
+        ## Prep our mac filter
+        self.blinder = blinder
+
+        ##Do some filtering to ignore parsing we don't need
+        self.onlyCare()
+        self.pipeSleep = 20
+        self.availPipes = ['/mnt/usb_storage/bluesPipe-1',
+                           '/mnt/usb_storage/bluesPipe-2']
+
+        ## Check for known macs to ignore -- need to use regex...
+        if os.path.isfile('ignore.lst'):
+            with open('ignore.lst', 'r') as iFile:
+                iList = iFile.read().splitlines()
+            self.blinder.ignoreSet = set()
+            for i in iList:
+                if len(i) == 17:
+                    self.blinder.ignoreSet.add(i.lower())
+                    self.IGNORE = True
+        else:
+            self.IGNORE = False
+
+        ## Remove a cycle by ignoring at this level of the Class
+        if self.IGNORE is True:
+            self.eyeball = self.blinder.seenTest_ignore
+            print('\n[~] Ignoring MACs from ignore.lst:\n{0}\n'.format(self.blinder.ignoreSet))
+        else:
+            self.eyeball = self.blinder.seenTest_noignore
+            print('\n[~] Not ignoring any MACs\n')
+
+        ## db creds
+        if os.path.isfile('config.ini'):
+            parser = ConfigParser()
+            psr = parser.read('config.ini')
+            self.dbUser = parser.get('creds', 'dbUser')
+            self.dbPass = parser.get('creds', 'dbPass')
+            self.dbHost = parser.get('creds', 'dbHost')
+            self.dbName = parser.get('creds', 'dbName')
+            print('[+] Credentials loaded from config.ini\n')
+        else:
+            self.dbUser = 'root'
+            self.dbPass = 'idrop'
+            self.dbHost = '127.0.0.1'
+            self.dbName = 'idrop'
+            print('[-] config.ini not found -- going with defaults\n')
+
+        ## Connect to the db
+        self.con, self.db, self.dbName = self.pgsqlPrep()
+        self.PRN = self.pgsqlFilter()
+
+        ## Store the args
+        self.args = args
 
 
     def onlyCare(self):
@@ -55,7 +227,12 @@ class Blue(object):
                         scapy.layers.bluetooth4LE.BTLE_RF,
                         scapy.layers.bluetooth4LE.BTLE_ADV,
                         scapy.layers.bluetooth4LE.EIR_Hdr]
+        self.blinder.choices = self.choices
         conf.layers.filter(self.choices)
+
+
+    def pipePush(self, pipe, sVal):
+        bPipe = os.system('/usr/bin/timeout {0} /usr/bin/ubertooth-btle -f -q {1} 1>/dev/null'.format(sVal, pipe))
 
 
     def pgsqlFilter(self):
@@ -63,10 +240,10 @@ class Blue(object):
             epoch, lDate, lTime = self.timer()
 
             ## Only test if known MAC field(s) exists
-            if self.choiceMaker(packet) is True:
+            if self.blinder.choiceMaker(packet) is True:
 
                 ### THIS IS ENTRY POINT
-                if self.seenTest(packet) is False:
+                if self.eyeball(packet) is False:
 
                     ### CLEARED HOT TO LOG
                     tStamp = str(lDate) + ' ' + str(lTime)
@@ -100,10 +277,10 @@ class Blue(object):
                                                        tStamp,
                                                        lDate,
                                                        lTime,
-                                                       self.bTuple[0],
-                                                       self.bTuple[1],
-                                                       self.bTuple[2],
-                                                       self.bTuple[3],
+                                                       self.blinder.bTuple[0],
+                                                       self.blinder.bTuple[1],
+                                                       self.blinder.bTuple[2],
+                                                       self.blinder.bTuple[3],
                                                        pSignal,
                                                        pNoise))
                     except Exception as E:
@@ -114,7 +291,7 @@ class Blue(object):
     def pgsqlPrep(self):
         """ Connect and prep the pgsql db"""
         try:
-            cStr = "dbname='idrop' user='%s' host='%s' password='%s'" % ('root', '127.0.0.1', 'idrop')
+            cStr = "dbname='%s' user='%s' host='%s' password='%s'" % (self.dbName, self.dbUser, self.dbHost, self.dbPass)
             con = psycopg2.connect(cStr)
             con.autocommit = True
             db = con.cursor()
@@ -141,78 +318,6 @@ class Blue(object):
         return (con, db, dbName)
 
 
-    ### Move to a common library with snarf.py
-    def seenTest(self, packet):
-        """Gather essential identifiers for "have I seen this packet" test
-
-        Return False to continue with this test.  "seenTest", if not seen,
-        then continue
-
-        Will return False if the delta of now and previous timestamp
-        for a given frame are > self.unity.seenMaxTimer {Default 30 seconds},
-        otherwise we ignore, and thus by ignoring, we do not clog up the logs
-
-        Create a table, and store this data so we can query on the fly
-            - only with psql
-        """
-        self.bTuple = None                                                      ## Rework if threading
-        try:
-            if self.chosen == 'BTLE_ADV_IND':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_ADV_IND].AdvA,
-                               None,
-                               None)
-            if self.chosen == 'BTLE_ADV_NONCONN_IND':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_ADV_NONCONN_IND].AdvA,
-                               None,
-                               None)
-            if self.chosen == 'BTLE_ADV_SCAN_IND':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_ADV_SCAN_IND].AdvA,
-                               None,
-                               None,)
-            if self.chosen == 'BTLE_SCAN_REQ':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_SCAN_REQ].AdvA,
-                               None,
-                               packet[BTLE_SCAN_REQ].ScanA)
-            if self.chosen == 'BTLE_SCAN_RSP':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_SCAN_RSP].AdvA,
-                               None,
-                               None)
-            if self.chosen == 'BTLE_ADV_DIRECT_IND':
-                self.bTuple = (self.chosen,
-                               packet[BTLE_ADV_DIRECT_IND].AdvA,
-                               None,
-                               packet[BTLE_ADV_DIRECT_IND].InitA)
-        except Exception as E:
-            print(E)
-
-        ## Figure out if this combo has been seen before
-        if self.bTuple is not None:
-            if self.bTuple not in self.unity.seenDict:
-                self.unity.seenDict.update({self.bTuple: (1, time.time())})
-
-                # print("I AM NOT FOUND")
-                return False
-
-            ## Has been seen, now check time
-            else:
-                lastTime = self.unity.seenDict.get(self.bTuple)[1]
-                lastCount = self.unity.seenDict.get(self.bTuple)[0]
-                if (time.time() - lastTime) > self.unity.seenMaxTimer:
-
-                    ## Update delta timestamp
-                    self.unity.seenDict.update({self.bTuple: (lastCount + 1, time.time())})
-                    # print ('PASS TIMER')
-                    return False
-                else:
-                    # print ('FAIL TIMER')
-                    return True
-
-
     def timer(self):
         epoch = int(time.time())                                                ## Store the epoch in UTC
         lDate = time.strftime('%Y-%m-%d', time.localtime(epoch))                ## Store the date in local tz
@@ -220,23 +325,19 @@ class Blue(object):
         return epoch, lDate, lTime
 
 
-    def main(self, args):
+    def main(self):
         ## Unify it up
-        self.unity = Unify(args, control = None, kBlue = True)
-        self.unity.seenMaxTimer = 30
-        self.unity.seenDict = {}
+        self.blinder.unity = Unify(self.args, control = None, kBlue = True)
+        self.blinder.unity.seenMaxTimer = 30
+        self.blinder.unity.seenDict = {}
 
         while True:
             for pipe in self.availPipes:
                 print('sniffing pipe {0}'.format(pipe))
                 self.pipePush(pipe, self.pipeSleep)
-                p = sniff(offline = '{0}'.format(pipe), prn = self.PRN)                  ## need to thread and move on.
+                p = sniff(offline = '{0}'.format(pipe), prn = self.PRN)
                 time.sleep(.1)
         con.close()
-
-
-    def pipePush(self, pipe, sVal):
-        bPipe = os.system('/usr/bin/timeout {0} /usr/bin/ubertooth-btle -f -q {1} 1>/dev/null'.format(sVal, pipe))
 
 
 def crtlC(args):
@@ -246,6 +347,7 @@ def crtlC(args):
     return tmp
 
 if __name__ == '__main__':
+
     ## ARGUMENT PARSING
     parser = argparse.ArgumentParser(description = 'kBlue')
     group = parser.add_mutually_exclusive_group(required = True)
@@ -259,5 +361,6 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
 
     ## Launch
-    bl = Blue(args)
-    bl.main(args)
+    blinder = Blinder()
+    bl = Blue(args, blinder)
+    bl.main()

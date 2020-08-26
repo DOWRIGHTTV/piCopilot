@@ -1,5 +1,13 @@
+## 26 August 2020
+    - kBlue given option for ignoring a set of Bluetooth MAC addresses
+    - kBlue given option for a config.ini approach to credentials
+
+## 24 August 2020
+    - rc1.0 released
+    - Bluetooth integrations via kBlue.py
+
 ## 2 August 2020
-    - NDA release made available
+    - NDA-free release made available
 
 ## 27 December 2019
     - Mostly prod released now, making minor tweaks along the way
