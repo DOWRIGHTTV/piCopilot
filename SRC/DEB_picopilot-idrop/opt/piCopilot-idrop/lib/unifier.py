@@ -85,8 +85,9 @@ class Unify(object):
         """
         ### This converts to Wireshark style
         #int(wepCrypto.endSwap('0x' + p.byteRip(f.notdecoded[8:], qty = 8, compress = True)), 16)
-        self.epoch = int(time.time())                                           ## Store the epoch in UTC
-        self.lDate = time.strftime('%Y-%m-%d', time.localtime(self.epoch))      ## Store the date in local tz
-        self.lTime = time.strftime('%H:%M:%S', time.localtime(self.epoch))      ## Store the time in local tz
+        self.epoch = int(time.time())                                                ## Store the epoch in UTC
+        self.lDate = time.strftime('%Y-%m-%d', time.localtime(self.epoch))           ## Store the date in local tz
+        self.lTime = time.strftime('%H:%M:%S', time.localtime(self.epoch))           ## Store the time in local tz
+        self.pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.epoch))   ## Store the sql timestamp for UTC
         self.origStamp = self.origTime
         self.timeMarker = self.epoch

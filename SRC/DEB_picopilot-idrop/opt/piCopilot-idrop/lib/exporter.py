@@ -8,6 +8,7 @@ class Exporter(object):
 
     def pgsqlConnect(self):
         ## Connects
+        ### Need to fix this for config.ini purposes
         cStr = "dbname='idrop' user='root' host='127.0.0.1' password='idrop'"
         self.con = psycopg2.connect(cStr)
         self.con.autocommit = True

@@ -237,7 +237,7 @@ class Blue(object):
 
     def pgsqlFilter(self):
         def snarf(packet):
-            epoch, lDate, lTime = self.timer()
+            epoch, lDate, lTime, pi_timestamp = self.timer()
 
             ## Only test if known MAC field(s) exists
             if self.blinder.choiceMaker(packet) is True:
@@ -246,7 +246,6 @@ class Blue(object):
                 if self.eyeball(packet) is False:
 
                     ### CLEARED HOT TO LOG
-                    tStamp = str(lDate) + ' ' + str(lTime)
                     try:
                         pSignal = packet[BTLE_RF].signal
                         pNoise = packet[BTLE_RF].noise
@@ -274,7 +273,7 @@ class Blue(object):
                                                              %s,
                                                              %s);
                                                  """, (epoch,
-                                                       tStamp,
+                                                       pi_timestamp,
                                                        lDate,
                                                        lTime,
                                                        self.blinder.bTuple[0],
@@ -322,7 +321,8 @@ class Blue(object):
         epoch = int(time.time())                                                ## Store the epoch in UTC
         lDate = time.strftime('%Y-%m-%d', time.localtime(epoch))                ## Store the date in local tz
         lTime = time.strftime('%H:%M:%S', time.localtime(epoch))                ## Store the time in local tz
-        return epoch, lDate, lTime
+        pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(epoch))   ## Store the sql timestamp for UTC
+        return epoch, lDate, lTime, pi_timestamp
 
 
     def main(self):

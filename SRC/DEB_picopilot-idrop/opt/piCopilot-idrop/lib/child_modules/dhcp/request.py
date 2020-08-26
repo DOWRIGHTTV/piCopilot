@@ -35,7 +35,7 @@ class Request(object):
                                                           ?);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
+                                      self.unity.pi_timestamp,
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       packet.addr1,
@@ -77,7 +77,7 @@ class Request(object):
                                                   %s);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
+                                      self.unity.pi_timestamp,
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       packet.addr1,

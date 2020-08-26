@@ -1,3 +1,6 @@
+## 0.5.4 - 20200826
+    - Fixed timezone issue with Grafana
+
 ## 26 August 2020
     - kBlue given option for ignoring a set of Bluetooth MAC addresses
     - kBlue given option for a config.ini approach to credentials

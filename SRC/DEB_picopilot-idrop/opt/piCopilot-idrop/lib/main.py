@@ -175,7 +175,7 @@ class Main(object):
                                                         ?);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
+                                      self.unity.pi_timestamp,
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       o1,
@@ -240,7 +240,7 @@ class Main(object):
                                                      %s);
                                 """, (self.unity.logDict.get('total'),
                                       self.unity.epoch,
-                                      str(self.unity.lDate) + ' ' + str(self.unity.lTime),
+                                      self.unity.pi_timestamp,
                                       self.unity.lDate,
                                       self.unity.lTime,
                                       o1,
