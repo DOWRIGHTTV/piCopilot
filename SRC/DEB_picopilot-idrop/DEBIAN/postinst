@@ -6,3 +6,8 @@ chown -R postgres /opt/piCopilot-idrop/logs
 ## Start supervisor daemon
 systemctl start supervisor
 systemctl enable supervisor
+
+## Ensure postgresql running
+systemctl enable postgresql
+systemctl start postgresql
+

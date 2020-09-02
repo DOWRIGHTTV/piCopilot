@@ -34,6 +34,31 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
     - Select NIC prep
     - The system will shutdown
 
+### Performance boosts (Recommended - Required for kBlue)
+For SD card preservation, dphys-swapfile is disabled.  It is preferable to offload any swapping to a USB:
+1. Prepare a USB thumb-drive of ideally at least 8GB in size split evenly on the partitions.
+    - /dev/sda1 should be swap
+    - /dev/sda2 should be ext4
+
+2. ***Optional thrashing including***
+    - If not worried about the SD card, then do
+```
+systemctl enable dphys-swapfile
+```
+
+3. Setup /etc/fstab for mounts:
+```
+mkdir -p /mnt/usb_storage
+echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab
+echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab
+```
+
+4. Final steps
+    - Power down the Raspberry Pi
+    - Plugin USB drive and ubertooth
+    - Power on the Raspberry Pi
+
+
 ### Grafana visualizations (Optional)
 Setup Grafana and visualize your findings
     - systemctl start grafana-server
@@ -42,7 +67,7 @@ Setup Grafana and visualize your findings
     - Change the default Grafana password
     - A sample dashboard for idrop is waiting on you
 
-### kBlue setup (Optional)
+### Tuning kBlue (Optional)
 Benchmark on Raspberry Pi 3 Model B+ as determined by [blRip.py](https://github.com/stryngs/workshops/blob/master/DC28/blRip.py) w/ no print:
 ```
 $ python3 blRip.py
@@ -50,23 +75,6 @@ Total time: 24.86375856399536
 Packets processed: 19235
 Packets per second: 773.6159418734769
 ```
-1. Prepare a USB thumb-drive of ideally at least 8GB in size split evenly on the partitions.
-    - /dev/sda1 should be swap
-    - /dev/sda2 should be ext4
-
-2. Setup /etc/fstab for mounts:
-```
-mkdir -p /mnt/usb_storage
-echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab
-echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab
-```
-
-3. Final steps
-    - Power down the Raspberry Pi
-    - Plugin USB drive and ubertooth
-    - Power on the Raspberry Pi
-
-#### Tuning kBlue
 With the limited horsepower of a Raspberry Pi, any shortcuts we can take are vital to keeping up with the live data flow.  By ignoring MAC Addresses that are known and unwanted for monitoring we can cut down on the chaff in the database.  To invoke this feature place a file named /opt/piCopilot-idrop/ignore.lst.  This file should consist of MAC addresses separated by a newline.  For now the only checking done on this is a character count.  The case of the string does not matter.  MAC addresses should be in colon format, i.e.:
 ```
 aa:bb:cc:dd:ee:ff
@@ -91,7 +99,6 @@ piCopilot has been tested and verified with the Pixhawk IMU.  The unmanned packa
 ### Known bug(s)
     - For the page on /, the idrop Service gets confused by the presence of kBlue and how sh.sysMode is used.  When enabling kBlue and returning to the main menu, the idrop Service will now read as kBlue.  This will be worked out in later releases.  To force it proper, cycle the idrop service off and then back on.  It will correct by virtue of sh.sysMode flipping through the original idrop logic.
     - kBlue makes use of the Ubertooth by way of ubertooth-btle and reading from a pre-recorded stream.  The streams default to 20 seconds per stream in real-time.  As kBlue currently does not rip stdout for ubertooth-btle, there is no time association just yet.  Every packet within a given burst of packets on a given bluesPipe will have the timestamp until a workaround is found.
-    - Timezone and plotting issues with Grafana.
 
 ### Up next
     - Further kSnarf and kBlue method integrations.
