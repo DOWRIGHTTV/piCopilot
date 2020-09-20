@@ -10,41 +10,22 @@ class Dhcp(object):
         self.discovery = discovery.Discovery(dbInstance, unity)
         self.request = request.Request(dbInstance, unity)
 
-        ## sqlite
-        if self.unity.args.psql is not True:
-            dbInstance.db.execute("""
-                                  CREATE TABLE IF NOT EXISTS dhcp(pid INTEGER,
-                                                                  epoch INTEGER,
-                                                                  pi_timestamp TIMESTAMPTZ,
-                                                                  date TEXT,
-                                                                  time TEXT,
-                                                                  addr1 TEXT,
-                                                                  addr2 TEXT,
-                                                                  addr3 TEXT,
-                                                                  message_type TEXT,
-                                                                  requested_addr TEXT,
-                                                                  server TEXT,
-                                                                  vendor TEXT,
-                                                                  hostname TEXT);
-                                  """)
-
-        ## psql
-        else:
-            dbInstance.db.execute("""
-                                  CREATE TABLE IF NOT EXISTS dhcp(pid INT,
-                                                                  epoch INT,
-                                                                  pi_timestamp TIMESTAMPTZ,
-                                                                  date TEXT,
-                                                                  time TEXT,
-                                                                  addr1 TEXT,
-                                                                  addr2 TEXT,
-                                                                  addr3 TEXT,
-                                                                  message_type TEXT,
-                                                                  requested_addr TEXT,
-                                                                  server TEXT,
-                                                                  vendor TEXT,
-                                                                  hostname TEXT);
-                                  """)
+        ## Create
+        dbInstance.db.execute("""
+                              CREATE TABLE IF NOT EXISTS dhcp(pid INT,
+                                                              epoch INT,
+                                                              pi_timestamp TIMESTAMPTZ,
+                                                              date TEXT,
+                                                              time TEXT,
+                                                              addr1 TEXT,
+                                                              addr2 TEXT,
+                                                              addr3 TEXT,
+                                                              message_type TEXT,
+                                                              requested_addr TEXT,
+                                                              server TEXT,
+                                                              vendor TEXT,
+                                                              hostname TEXT);
+                              """)
 
     def trigger(self, packet):
         """Trigger mechanism for DHCP entries

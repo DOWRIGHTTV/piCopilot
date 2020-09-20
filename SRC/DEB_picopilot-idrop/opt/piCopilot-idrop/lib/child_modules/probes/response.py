@@ -1,7 +1,7 @@
 from scapy.all import *
 
 class Response(object):
-    """Adds Probe Response entries to a pre-existing sqlite3/psql database"""
+    """Adds Probe Response entries"""
     def __init__(self, dbInstance, unity):
         self.cap = dbInstance
         self.unity = unity
@@ -9,62 +9,34 @@ class Response(object):
 
     def entry(self, packet):
         """packet.haslayer('Dot11ProbeResp')"""
-
-        ## sqlite
-        if self.unity.args.psql is not True:
-            try:
-                self.cap.db.execute("""
-                                    INSERT INTO `probes` VALUES(?,
-                                                                ?,
-                                                                ?,
-                                                                ?,
-                                                                ?,
-                                                                ?,
-                                                                ?,
-                                                                ?,
-                                                                ?);
-                                    """, (self.unity.logDict.get('total'),
-                                          self.unity.epoch,
-                                          self.unity.pi_timestamp,
-                                          self.unity.lDate,
-                                          self.unity.lTime,
-                                          self.unity.PE.sType.mgmtSubtype(packet.subtype),
-                                          packet.addr1,
-                                          packet.addr2,
-                                          str(packet[Dot11Elt].info)))
-            except Exception as E:
-                print (E)
-
-        ## psql
-        else:
-            try:
-                self.cap.db.execute("""
-                                    INSERT INTO probes (pid,
-                                                        epoch,
-                                                        pi_timestamp,
-                                                        date,
-                                                        time,
-                                                        subtype,
-                                                        addr1,
-                                                        addr2,
-                                                        essid)
-                                                VALUES (%s,
-                                                        %s,
-                                                        %s,
-                                                        %s,
-                                                        %s,
-                                                        %s,
-                                                        %s,
-                                                        %s,
-                                                        %s);
-                                    """, (self.unity.logDict.get('total'),
-                                          self.unity.epoch,
-                                          self.unity.pi_timestamp,
-                                          self.unity.lDate,
-                                          self.unity.lTime,
-                                          self.unity.PE.sType.mgmtSubtype(packet.subtype),
-                                          packet.addr1,
-                                          packet.addr2,
-                                          str(packet[Dot11Elt].info)))
-            except Exception as E:
-                print (E)
+        try:
+            self.cap.db.execute("""
+                                INSERT INTO probes (pid,
+                                                    epoch,
+                                                    pi_timestamp,
+                                                    date,
+                                                    time,
+                                                    subtype,
+                                                    addr1,
+                                                    addr2,
+                                                    essid)
+                                            VALUES (%s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s,
+                                                    %s);
+                                """, (self.unity.logDict.get('total'),
+                                      self.unity.epoch,
+                                      self.unity.pi_timestamp,
+                                      self.unity.lDate,
+                                      self.unity.lTime,
+                                      self.unity.PE.sType.mgmtSubtype(packet.subtype),
+                                      packet.addr1,
+                                      packet.addr2,
+                                      packet[Dot11Elt].info.decode()))
+        except Exception as E:
+            print (E)

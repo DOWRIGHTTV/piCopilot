@@ -6,10 +6,13 @@ import sys
 class Exporter(object):
     """All things sql export"""
 
+    def __init__(self, shared):
+        self.shared = shared
+
     def pgsqlConnect(self):
         ## Connects
         ### Need to fix this for config.ini purposes
-        cStr = "dbname='idrop' user='root' host='127.0.0.1' password='idrop'"
+        cStr = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(self.shared.unity.db, self.shared.unity.user, self.shared.unity.host, self.shared.unity.password)
         self.con = psycopg2.connect(cStr)
         self.con.autocommit = True
         self.db = self.con.cursor()

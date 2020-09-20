@@ -11,11 +11,10 @@ class Probes(object):
         self.request = request.Request(dbInstance, unity)
         self.response = response.Response(dbInstance, unity)
 
-        ## sqlite
-        if unity.args.psql is not True:
-            dbInstance.db.execute("""
-                                  CREATE TABLE IF NOT EXISTS probes(pid INTEGER,
-                                                                    epoch INTEGER,
+        ## Create
+        dbInstance.db.execute("""
+                                CREATE TABLE IF NOT EXISTS probes(pid INT,
+                                                                    epoch INT,
                                                                     pi_timestamp TIMESTAMPTZ,
                                                                     date TEXT,
                                                                     time TEXT,
@@ -23,20 +22,7 @@ class Probes(object):
                                                                     addr1 TEXT,
                                                                     addr2 TEXT,
                                                                     essid TEXT);
-                                  """)
-        ## psql
-        else:
-            dbInstance.db.execute("""
-                                  CREATE TABLE IF NOT EXISTS probes(pid INT,
-                                                                     epoch INT,
-                                                                     pi_timestamp TIMESTAMPTZ,
-                                                                     date TEXT,
-                                                                     time TEXT,
-                                                                     subtype TEXT,
-                                                                     addr1 TEXT,
-                                                                     addr2 TEXT,
-                                                                     essid TEXT);
-                                  """)
+                                """)
 
 
     def trigger(self, packet):

@@ -28,7 +28,7 @@ def crtlC(cap, unity):
             print('uniques       -- {0}\n'.format(len(unity.seenDict)))
 
         ## Unload tuples for visual comfort
-        if unity.args.psql is True and unity.args.m == 'ids':
+        if unity.args.m == 'ids':
             print('\ntulpleSet dump:')
             print(len(unity.tupleSet))
             print(unity.tupleSet.pop())
@@ -255,6 +255,8 @@ if __name__== '__main__':
                         help = 'manual mode')
     parser.add_argument('--beat',
                         help = 'PSQL heartbeat timing')
+    parser.add_argument('--db',
+                        help = 'database name')
     parser.add_argument('--fwip',
                         help = 'PSQL firewall ip to listen for syslog')
     parser.add_argument('--hop',

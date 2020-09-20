@@ -11,9 +11,6 @@ from lib.shared import Shared
 class Snarf(object):
     """Main class for packet handling"""
     def __init__(self, dbInstance, unity, sProtocol):
-        if unity.args.z is True:
-            print ('snarf.Snarf instantiated')
-
         self.cap = dbInstance
         self.unity = unity
         self.main = Main(self.cap, self.unity)
@@ -25,6 +22,7 @@ class Snarf(object):
 
         ### Eventually backport this
         self.sh = Shared()
+        self.sh.unity = self.unity
 
         print ('Using pkt silent time of:\n{0}\n'.format(self.unity.seenMaxTimer))
 
@@ -46,19 +44,18 @@ class Snarf(object):
             self.pStore = False
 
         ## Track unique addr combos
-        if unity.args.psql is True:
-            self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pid INT,\
-                                                                    epoch INTEGER,\
-                                                                    pi_timestamp TIMESTAMPTZ,\
-                                                                    date TEXT,\
-                                                                    time TEXT,\
-                                                                    type TEXT,\
-                                                                    subtype TEXT,\
-                                                                    FCfield TEXT,\
-                                                                    addr1 TEXT,\
-                                                                    addr2 TEXT,\
-                                                                    addr3 TEXT,\
-                                                                    addr4 TEXT)')
+        self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pid INT,\
+                                                                epoch INTEGER,\
+                                                                pi_timestamp TIMESTAMPTZ,\
+                                                                date TEXT,\
+                                                                time TEXT,\
+                                                                type TEXT,\
+                                                                subtype TEXT,\
+                                                                FCfield TEXT,\
+                                                                addr1 TEXT,\
+                                                                addr2 TEXT,\
+                                                                addr3 TEXT,\
+                                                                addr4 TEXT)')
 
     def subParser(self, packet):
         if packet.type == 0:
@@ -122,7 +119,10 @@ class Snarf(object):
 
                     ## Notify
                     print('SNARF!! {0} traffic detected!'.format(tName))
+
+                    ### verify before trusting hexstr(str())
                     notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
+
                     try:
                         fSig = -(256 - int(notDecoded[self.unity.offset + 3], 16))
                     except IndexError:
@@ -150,7 +150,10 @@ class Snarf(object):
 
                     ## Notify
                     print('SNARF!! {0} traffic detected!'.format(tName))
+
+                    ### verify before trusting hexstr(str())
                     notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
+
                     try:
                         fSig = -(256 - int(notDecoded[self.unity.offset + 3], 16))
                     except IndexError:
@@ -191,12 +194,7 @@ class Snarf(object):
             if 'beacon' in self.unity.args.e:
                 if packet.haslayer(Dot11Beacon):
                     return True
-                else:
-                    return False
-            else:
-                return False
-        else:
-            return False
+        return False
 
 
     ### Move to handler.py
@@ -218,60 +216,6 @@ class Snarf(object):
         if 'probes' in self.protocols:
             if self.probes.trigger(packet) == True:
                 self.unity.logUpdate('probes')
-
-
-    def reader(self):
-        def snarf(packet):
-            """Parse a PCAP"""
-
-            ## Test for exclusions
-            if self.handlerExclusion(packet) is False:
-
-                ## Test for whitelisting if wanted
-                if len(self.unity.wSet) > 0:
-                    if self.whiteLister(self.unity.wSet, packet) is False:
-
-                        ### THIS IS ENTRY POINT
-                        if self.seenTest(packet) is False:
-                            ### CLEAR HOT TO LOG
-
-                            self.handlerMain(packet)
-                            self.handlerProtocol(packet)
-                            if self.pStore is not False:
-                                self.pStore.write(packet)
-
-                            ## stdouts
-                            self.unity.logUpdate('iterCount')
-                            if self.unity.logDict.get('iterCount') == 1000:
-                                #self.cap.con.commit()
-                                print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
-                                self.unity.logDict.update({'iterCount': 0})
-                        else:
-                            return
-                    else:
-                        return
-                else:
-                    #What if it is not wanted
-                    ### THIS IS ENTRY POINT
-                    if self.seenTest(packet) is False:
-                        ### CLEAR HOT TO LOG
-
-                        self.handlerMain(packet)
-                        self.handlerProtocol(packet)
-                        if self.pStore is not False:
-                            self.pStore.write(packet)
-
-                        ## stdouts
-                        self.unity.logUpdate('iterCount')
-                        if self.unity.logDict.get('iterCount') == 1000:
-                            #self.cap.con.commit()
-                            print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
-                            self.unity.logDict.update({'iterCount': 0})
-                    else:
-                        return
-            else:
-                return
-        return snarf
 
 
     def seenTest(self, packet):
@@ -408,6 +352,9 @@ class Snarf(object):
                         ## stdouts
                         self.unity.logUpdate('iterCount')
                         if self.unity.logDict.get('iterCount') == 1000:
+
+                            ### Make this x/y style where x == stored and y == total
+
                             print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
                             self.unity.logDict.update({'iterCount': 0})
                     else:

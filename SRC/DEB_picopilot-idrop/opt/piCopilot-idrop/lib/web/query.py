@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import json
+import officeTasks as OT
 import os
 import time
-import sqlite3 as lite
 import shutil
 import subprocess
 from lib.exporter import Exporter
+from lib.truncater import Truncater
+from lib.plotter import Plotter
 from flask import Blueprint, render_template, request, send_file
 
 class QUERY(object):
@@ -17,7 +19,10 @@ class QUERY(object):
         ## Grab our shared object
         self.sh = sh
 
-        self.exporter = Exporter()
+        self.exporter = Exporter(self.sh)
+        self.truncater = Truncater(self.sh)
+        self.plotter = Plotter(self.sh)
+
 
         ## Call up our blueprint
         self.query = Blueprint('query',
@@ -28,60 +33,39 @@ class QUERY(object):
 
 
 
-        ## Homepages ##
+        ## Homepage ##
         @self.query.route('/Queries')
         def index():
             #if sh.sysMode = 'None':
 
             return render_template('query/index.html',
                                    _kSnarf = self.sh.rlCheck('kSnarfPsql'),
-                                   logSize = self.sh.logSize(),
+                                   logSize = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                    hddAvail = self.sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 ###############################################################################
 
 
 
-        ## Configurations ##
+        ## Log deletion ##
         @self.query.route('/Query/Log-Delete')
         def logDelete():
-            query_status = self.sh.rlCheck('query_Service')
-            if query_status == 'RUNNING':
-                return render_template('query/control/logDelete.html',
-                                       action = 'deleted')
-            else:
-                try:
-                    os.remove('/opt/piCopilot-idrop/downloads/logs.zip')
-                except:
-                    pass
-                shutil.rmtree('/opt/piCopilot-idrop/logs')
-                os.mkdir('/opt/piCopilot-idrop/logs')
-                return render_template('query/index.html',
-                                       _kSnarf = self.sh.rlCheck('kSnarf'),
-                                       logSize = self.sh.logSize(),
-                                       hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+            try:
+                os.remove('/opt/piCopilot-idrop/downloads/logs.zip')
+            except:
+                pass
+            shutil.rmtree('/opt/piCopilot-idrop/logs')
+            os.mkdir('/opt/piCopilot-idrop/logs')
+            os.system('chown -R postgres /opt/piCopilot-idrop/logs')
+            self.truncater.truncate()
+            return render_template('query/index.html',
+                                   _kSnarf = self.sh.rlCheck('kSnarfPsql'),
+                                   logSize = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
+                                   hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 ###############################################################################
 
 
-        ## No-Click Functions ##
-        @self.query.route('/System/Log-Download')
-        def logDownload():
-            """Controls the download capabilities"""
-            query_status = self.sh.rlCheck('kSnarf')
-            print ('OUR QUERY STAT')
-            print(query_status)
-            if query_status == 'RUNNING':
-                return render_template('system/control/logDelete.html',
-                                       action = 'downloaded')
-            else:
-                try:
-                    os.remove('/opt/piCopilot-idrop/downloads/logs.zip')
-                except:
-                    pass
-                shutil.make_archive('/opt/piCopilot-idrop/downloads/logs/', 'zip', root_dir='/opt/piCopilot-idrop/logs')
-                return send_file('/opt/piCopilot-idrop/downloads/logs.zip', as_attachment=True)
-
-
-        @self.query.route('/System/Log-Download_pgsql')
+        ## Log download ##
+        @self.query.route('/Query/Log-Download_pgsql')
         def pgLogDownload():
             """Controls the download capabilities for pgsql"""
             try:
@@ -100,3 +84,18 @@ class QUERY(object):
             os.system('rm -f /opt/piCopilot-idrop/logs/to-ds.csv')
             os.system('rm -f /opt/piCopilot-idrop/logs/pipes.csv')
             return send_file('/opt/piCopilot-idrop/downloads/logs.zip', as_attachment=True)
+###############################################################################
+
+
+        ## Visuals ##
+        @self.query.route('/Query/visuals')
+        def pgVisuals():
+            """Create interactive visuals for pgsql"""
+            OT.gnr.sweep('/opt/piCopilot-idrop/visuals', mkdir = True)
+            self.plotter.probeReq(rType = 'max')
+            self.plotter.probeReq(rType = 'min')
+            self.plotter.lDir()
+            return render_template('query/index.html',
+                                   _kSnarf = self.sh.rlCheck('kSnarfPsql'),
+                                   logSize = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
+                                   hddAvail = self.sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-
-from flask import Blueprint, render_template, request
-import os, time
-
+import os
 import RPi.GPIO as GPIO
 import subprocess
-from datetime import datetime
 import time
+from datetime import datetime
+from flask import Blueprint, render_template, request
 
 class SYSTEM(object):
     """Class for all things idrop or Pi Shutdown/Reboot"""
@@ -36,25 +34,11 @@ class SYSTEM(object):
         def index():
             """Start the service"""
             return render_template('system/control/index.html',
-                                   uChoice = ['ListenSql', 'ListenPsql', 'k9', 'Off'])
+                                   uChoice = ['ListenPsql', 'k9', 'Off'])
 ###############################################################################
 
 
         ## No-Click Functions ##
-        #@self.system.route('/System/NICprep', methods = ['POST'])
-        #def nicPrep():
-            #"""Prep the NIC by matching MACs
-
-            #Cheap way to reboot
-            #"""
-            #self.sh.rlControl('start','nicPrep')
-            ##self.sh.bashReturn('bash /opt/piCopilot-scripts/nicPrep.sh')
-            #return render_template('index.html',
-                                #system_Service = sh.rlCheck('kSnarf'),
-                                #system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5'} | cut -d\) -f1| tail -n 1"),
-                                #query_logSize = sh.logSize(),
-                                #system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
-
         @self.system.route('/System/Service-Control', methods = ['POST'])
         def serviceControl():
             """Change the idrop system Relay Controls"""
@@ -80,39 +64,6 @@ class SYSTEM(object):
                         except:
                             pass
                         pass
-
-
-            ## If the service is running and we turn off
-            if self.sh.rlCheck('kSnarfSqlite') == 'RUNNING':
-                ### Really need to add more mature logic.  This is just to get us running with psql
-
-                if self.sh.systemServiceControl == 'k9':
-                    ret = '<strong>You cannot invoke k9 mode when idrop is in listen mode</strong>'
-                    ret += '</br></br>'
-                    ret += '<a href="/">'
-                    ret += '    <button>Main Menu</button>'
-                    ret += '</a>'
-                    return ret
-
-                if self.sh.systemServiceControl == 'Off':
-                    self.sh.rlControl('stop', 'kSnarfSqlite')
-                    GPIO.output(23, GPIO.LOW)
-
-
-                    ## Cheap way to snipe kSnarf as it is hanging
-                    kPID = str(self.sh.bashReturn("ps aux | grep kSnar[f] | awk '{print $2}'"))
-                    print ('OUR kSnarf PID IS {0}'.format(str(kPID)))
-                    print ('OUR kSnarf PID IS TYPE {0}'.format(str(type(kPID))))
-                    try:
-                        self.sh.bashReturn("kill -9 %s" % kPID)
-                    except:
-                        time.sleep(2)
-                        try:
-                            self.sh.bashReturn("kill -9 %s" % kPID)
-                        except:
-                            pass
-                        pass
-
 
             ## If the service is running and we turn off
             if self.sh.rlCheck('kSnarfPsql') == 'RUNNING':
@@ -156,11 +107,6 @@ class SYSTEM(object):
                 ## Check for k9 mode
                 if self.sh.systemServiceControl == 'k9':
                     self.sh.rlControl('start', 'k9')
-                    GPIO.output(23, GPIO.HIGH)
-
-                ## Check for listen mode sqlite
-                if self.sh.systemServiceControl == 'ListenSql':
-                    self.sh.rlControl('start', 'kSnarfSqlite')
                     GPIO.output(23, GPIO.HIGH)
 
                 ## Check for listen mode psql

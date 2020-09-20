@@ -1,8 +1,8 @@
 Package: picopilot-idrop
-Version: 0.5.6
+Version: 0.5.8
 Architecture: all
-Depends: picopilot, picopilot-scripts, picopilot-wifi
+Depends: picopilot, picopilot-scripts, picopilot-visuals, picopilot-wifi, python3-psutil, gpsd
 Section: net
 Priority: optional
-Description: Intrustion Detection Reaction Observation Platform for piCopilot.
+Description: Intrusion Detection Reaction Observation Platform for piCopilot.
 Maintainer: stryngs <info@127.0.0.1>

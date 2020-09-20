@@ -7,10 +7,7 @@ import time
 class Unify(object):
     """This class acts a singular point of contact for tracking purposes"""
 
-    def __init__(self, args, control = None, kBlue = None):
-        if kBlue is None:
-            if args.z:
-                print ('unifier.Unify instantiated')
+    def __init__(self, args, control = None, kBlue = None):        
         self.epoch = None
         self.lDate = None
         self.lTime = None

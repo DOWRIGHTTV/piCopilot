@@ -21,6 +21,7 @@
             .idrop {background-color: #4CAF50;}
             .query {background-color: #008CBA;}
             .black {background-color: #555555;}
+            .blue {background-color: #0DA2FF;}
         </style>
     </head>
     <body>
@@ -60,7 +61,7 @@
         </br>
         </br>
         <a href={{ url_for('blue.index') }}>
-            <button class="kBlue">
+            <button class="blue">
                 kBlue
             </button>
         </a>
@@ -92,14 +93,6 @@
                 </td>
                 <td>
                     {{ system_hddAvail }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    SQLite Log Usage
-                </td>
-                <td>
-                    {{ query_logSize }}
                 </td>
             </tr>
             <tr>

@@ -17,6 +17,7 @@
                 text-align: left;
                 padding: 8px;
             }
+            .red {background-color: #FF0000;}
         </style>
     </head>
     <body>
@@ -43,7 +44,7 @@
             </tr>
             <tr>
                 <td>
-                    Log Usage
+                    SQL Usage
                 </td>
                 <td>
                     {{ logSize }}
@@ -53,28 +54,34 @@
         </br>
         </br>
         </br>
-        <a href={{ url_for('query.logDownload') }}>
-            <button>
-                Download idrop sqlite3 Logs
-            </button>
-        </a>
-        </br>
-        </br>
-        </br>
-        </br>
         <a href={{ url_for('query.pgLogDownload') }}>
             <button>
-                Download idrop pgsql Logs
+                Download idrop logs
             </button>
         </a>
         </br>
         </br>
-
+        <a href={{ url_for('query.pgVisuals') }}>
+            <button>
+                Generate visuals for idrop logs
+            </button>
+        </a>
+        </br>
+        </br>
+        <a href="http://192.168.10.254:9090" target="_blank">
+            <button>
+                Open visuals for idrop logs
+            </button>
+        </a>
+        </br>
+        </br>
+        </br>
+        </br>
         </br>
         </br>
         <a href={{ url_for('query.logDelete') }}>
-            <button>
-                Delete idrop Logs
+            <button class="red">
+                Delete idrop logs
             </button>
         </a>
         <a href={{ url_for('index') }} style="position:absolute; bottom:10px; right:10px;">

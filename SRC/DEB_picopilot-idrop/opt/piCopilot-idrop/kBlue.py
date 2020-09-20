@@ -10,7 +10,6 @@ import os
 import re
 import time
 import signal
-import sqlite3 as lite
 import sys
 import psycopg2
 from configparser import ConfigParser
@@ -290,7 +289,7 @@ class Blue(object):
     def pgsqlPrep(self):
         """ Connect and prep the pgsql db"""
         try:
-            cStr = "dbname='%s' user='%s' host='%s' password='%s'" % (self.dbName, self.dbUser, self.dbHost, self.dbPass)
+            cStr = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(self.dbName, self.dbUser, self.dbHost, self.dbPass)
             con = psycopg2.connect(cStr)
             con.autocommit = True
             db = con.cursor()

@@ -15,6 +15,28 @@ Certain aspects of piCopilot may not be legal in every Country or locality.  Ens
 * piCopilot-wifi
   * WiFi meta-package for piCopilot
 
+### Definitions
+* ecosystem
+  * Any objects in memory, files, folders or system processes which make up how piCopilot operates
+* kBlue
+  * The underlying framework for Ubertooth and PostgreSQL interaction
+* kSnarf
+  * The underlying framework for 802.11 sniffing and PostgreSQL interaction
+* pipeline network
+  * The IPv4 network between the user and the ecosystem
+  * Built on an 802.11 model
+  * Can be 802.3 based with minor modifications
+  * Responsible for all interactions with piCopilot
+    * 3000 - Grafana
+    * 8000 - piCopilot-unmanned control panel
+    * 8001 - kSnarf and kBlue control panel
+    * 8765 - Motioneye
+    * 9001 - Supervisor
+    * 9090 - idrop visuals
+
+### Why does most of the system run as root!?
+piCopilot expects a secured network.  It is not recommended to connect the pipeline network to any network where untrusted users are present or have the ability to sniff traffic.  "Pick one thing and do it well".
+
 ### Getting started
 1. Create the piCopilot image for the Raspberry Pi
     - Refer to notes in RELEASE

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import os
+from configparser import ConfigParser
 from flask import current_app
 from flask import Flask
 from flask import render_template
@@ -22,7 +23,6 @@ def index():
                                system_Service = sh.sysMode,
                                system_Mode = 'None',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'k9':
@@ -31,16 +31,6 @@ def index():
                                system_Service = sh.sysMode,
                                system_Mode = sh.rlCheck('k9'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
-                               query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
-    if sh.sysMode == 'kSnarfSqlite':
-        return render_template('index.html',
-                               kBlue_Service = sh.rlCheck('kBlue'),
-                               system_Service = sh.sysMode,
-                               system_Mode = sh.rlCheck('kSnarfSqlite'),
-                               system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'kSnarfPsql':
@@ -49,7 +39,6 @@ def index():
                                system_Service = sh.sysMode,
                                system_Mode = sh.rlCheck('kSnarfPsql'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
     if sh.sysMode == 'Off':
@@ -58,7 +47,6 @@ def index():
                                system_Service = sh.sysMode,
                                system_Mode = 'Off',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 
@@ -68,7 +56,6 @@ def index():
                                system_Service = sh.sysMode,
                                system_Mode = sh.sysMode,
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                               query_logSize = sh.logSize(),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                                system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 
@@ -78,7 +65,6 @@ def index():
                            system_Service = sh.sysMode,
                            system_Mode = sh.sysMode,
                            system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
-                           query_logSize = sh.logSize(),
                            query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
                            system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
 ###############################################################################
@@ -100,8 +86,20 @@ def nicPrep():
 ###############################################################################
 
 if __name__ == '__main__':
+
+    ## Gen an empty class to pass around
+    class Foo(object):
+        pass
+
     ## Setup
-    sh = Shared()
+    f = Foo()
+    parser = ConfigParser()
+    parser.read('idrop.conf')
+    f.user = parser.get('creds', 'dbUser')
+    f.password = parser.get('creds', 'dbPass')
+    f.host = parser.get('creds', 'dbHost')
+    f.db = parser.get('creds', 'dbName')
+    sh = Shared(f)
 
     ## Instantiate needed classes
     systemClass = SYSTEM(sh)
@@ -112,7 +110,6 @@ if __name__ == '__main__':
 
     blueClass = BLUE(sh)
     blue = blueClass.blue
-
 
     ## Register children
     app.register_blueprint(system)

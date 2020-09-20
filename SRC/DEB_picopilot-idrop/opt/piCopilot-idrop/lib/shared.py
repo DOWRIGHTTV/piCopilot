@@ -3,8 +3,10 @@ import subprocess
 class Shared(object):
     """Shared idrop class"""
 
-    def __init__(self):
+    def __init__(self, unity = None):
         self.sysMode = 'None'
+        if unity is not None:
+            self.unity = unity
 
 
     def rlCheck(self, relay):
@@ -18,12 +20,6 @@ class Shared(object):
         self.sysMode = relay
         subprocess.check_output('supervisorctl {0} {1}'.format(button, relay),
                                 shell = True)
-
-
-    def logSize(self):
-        """Return the total size of all sql and pcap for idrop"""
-        return subprocess.check_output('du -h /opt/piCopilot-idrop/logs/ | tail -n 1 | cut -f1',
-                                       shell = True).decode().strip()
 
 
     def bashReturn(self, cmd):
