@@ -49,8 +49,7 @@ class Builder(object):
                 sys.exit(1)
         else:
             try:
-                self.pWord = getpass.getpass('PSQL Password?\n')
-                cStr = "dbname='{0}' user='{1}' host='{2}' password='{3}' sslmode='verify-full'" % (unity.args.db, unity.args.user, unity.args.host, self.pWord)
+                cStr = "dbname='{0}' user='{1}' host='{2}' password='{3}' sslmode='verify-full'" % (unity.args.db, unity.args.user, unity.args.host, unity.args.password)
                 self.con = psycopg2.connect(cStr)
                 self.con.autocommit = True
                 self.db = self.con.cursor()
@@ -62,8 +61,8 @@ class Builder(object):
                     self.con.close()
                     print('Tables dropped\n  [+] Exiting\n')
                     sys.exit(0)
-            except:
-                print ("I am unable to connect to the database ids")
+            except Exception as E:
+                print(E)
                 sys.exit(1)
 
 

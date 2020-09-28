@@ -254,19 +254,19 @@ if __name__== '__main__':
                         action = 'store_true',
                         help = 'manual mode')
     parser.add_argument('--beat',
-                        help = 'PSQL heartbeat timing')
+                        help = 'Heartbeat timing')
     parser.add_argument('--db',
                         help = 'database name')
     parser.add_argument('--fwip',
-                        help = 'PSQL firewall ip to listen for syslog')
+                        help = 'Firewall ip to listen for syslog')
     parser.add_argument('--hop',
                         help = 'Channel hop timing\n  [10 second default]')
     parser.add_argument('--host',
-                        help = 'PSQL host')
+                        help = 'PGSQL host')
     parser.add_argument('--id',
-                        help = 'PSQL IDS Identifier' )
+                        help = 'Identifier' )
     parser.add_argument('--password',
-                        help = 'PSQL password (Only for use with kSnarf wifi)')
+                        help = 'PGSQL Password')
     parser.add_argument('--pcap',
                         action = 'store_true',
                         help = 'Write a pcap for any non-excluded frames')
@@ -277,7 +277,7 @@ if __name__== '__main__':
                         action = 'store_true',
                         help = 'PSQL recovery mode to not start new for tuple')
     parser.add_argument('--user',
-                        help = 'PSQL username')
+                        help = 'PGSQL username')
     parser.add_argument('--wipe',
                         action = 'store_true',
                         help = 'drop all PSQL tables')
