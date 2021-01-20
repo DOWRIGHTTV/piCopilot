@@ -3,6 +3,47 @@ piCopilot is 100% feedback driven.  If you like piCopilot and wish to contribute
 
 Certain aspects of piCopilot may not be legal in every Country or locality.  Ensure that you check the rules and regulations for where you will be operating prior to use.  The operator is fully and wholly responsible for any legal and/or civil issues that may arise from their usage of piCopilot.
 
+## Defense against tools like piCopilot
+The Wireless and Bluetooth monitoring capabilities of piCopilot should bring pause to anyone.  piCopilot is not special in this regard, nor is it alone.  There are many tools which do the same thing and sometimes more so than even the idrop module; freely available by way of entities like Google and Github.  The very power one has when wielding a tool like piCopilot is immense.  Sharing of the code for the world to read comes with it a unique responsibility.
+
+The steps below are meant for the average consumer in 2021.  The point is to drive home the details in a way that someone who has not used piCopilot or studied how things like Wireless and Bluetooth work, "gets it".
+
+1. Keep Wireless and Bluetooth off when not in use, seriously.  Yes, really.
+
+Your device is noisy because it is always looking for the next best thing.  By turning off Wireless and Bluetooth when not in use you will reduce the unique signatures that can be associated with a common device in 2021 that has the ability to leverage Wireless or Bluetooth.  Tracking of those signatures is already in use by various advertising companies and potentially, Governmental agencies around the world.  Why make yourself a bigger target just for the sake of convenience?
+
+2. Work from home took on a whole new meaning.
+
+For about $35 worth of gear the world around you changes into 0s, 1s and patterns.  No longer does one have to wait until working hours are over to see a new ESSID on the off-chance an employee brought their laptop home from work.  The Internet as we have it in 2021 proved one thing, baked-in needs to be the new bolt-on.  Did you know a Bank moved in next door?  How about a Law firm?  That dentist too.  piCopilot surely does.
+
+3. Keep your list of "Remembered Networks" empty or at a minimum.  Your device can be fooled into giving out details of where it has tried to, or successfully connected to a Network Name (ESSID).  Statistics can paint quite the vivid picture if you know what you seek.
+
+Advertising the ESSID of your great aunt Sally is not something to be desired, please excuse.  Keep Sally's business to Sally.
+
+4. Know just how far your home network reaches.
+
+Don't know?  Take your phone out, pick a random direction and keep walking; all the while looking for your home wireless.  When you cannot see it anymore, chalk out your 360, you have reached your bubble's end.
+
+Reduce your power output if able.  Take a moment and login to that router of yours.  Go through the settings and see if there is a way to reduce the power output of the radio transmitter inside of it.  While maximum effect seems nice, it just may give Johnny across the way access to more than you bargained for.
+
+Protect the very knowledge of your bubbles and change them up at random when you can.
+
+Friends don't let friends keep ESSIDs for extended times.
+
+5. Realize that there is no anonymity with Wireless, Bluetooth or most any of the common protocols the average person knows in 2021.
+
+The very backbone of how it works would snap in half if you tried to truly make yourself invisible to others.  Who would they talk to if not you?  Using Wireless or Bluetooth tells anyone within roughly 100 yards of your position, "I am here".
+
+6. Build a piCopilot and learn just how all of this works.
+
+Anyone can code.  Anyone in 2021 should know the basics of how these common everyday protocols work.  Even if they'll never see it again, nor hear of it again; at least the seed was planted and maybe they'll remember.  The possibilities for modules like idrop and the like are endless and yet very well common; you just didn't know it.
+
+7. Press the communities like Motorola, Apple, ABC, Google, etc; press them that your security and privacy matter.  The current model has none of that and it should rather be widespread and far-flung.  If your phone doesn't have a way to randomize your MAC, you should be asking why.
+
+Out of the United States Ninth Circuit just such a thing happened; somewhat.  Joffe -v- Google.  Also known as 11-17483.  Thirty and five pages.  Brilliant, masterful and far-reaching by all rights.  Eight years and going strong, yet how many of you are just finding out now for the first time?
+
+11-17483 is the precedence.  What will you do with it?
+
 ### Core packages
 * piCopilot
   * The ecosystem
@@ -62,20 +103,14 @@ For SD card preservation, dphys-swapfile is disabled.  It is preferable to offlo
     - /dev/sda1 should be swap
     - /dev/sda2 should be ext4
 
-2. ***Optional thrashing including***
-    - If not worried about the SD card, then do
-```
-systemctl enable dphys-swapfile
-```
-
-3. Setup /etc/fstab for mounts:
+2. Setup /etc/fstab for mounts:
 ```
 mkdir -p /mnt/usb_storage
 echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab
 echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab
 ```
 
-4. Final steps
+3. Final steps
     - Power down the Raspberry Pi
     - Plugin USB drive and ubertooth
     - Power on the Raspberry Pi
