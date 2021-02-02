@@ -69,7 +69,13 @@ class VIDEO(object):
                     hostStatus = 'Inactive'
             except:
                 hostStatus = 'Inactive'
-            mc.bashReturn('killall -9 raspivid')
+
+            ## Kill any others
+            try:
+                mc.bashReturn('killall -9 raspivid')
+            except:
+                pass
+
             return render_template('index.html',
                                    telem_Service = mc.svCheck('telemetry_Service'),
                                    system_bridgeStatus = mc.bashReturn('systemctl status apache2 | grep "Active:" | cut -d: -f2 | cut -d\( -f1'),
@@ -91,6 +97,14 @@ class VIDEO(object):
                     hostStatus = 'Inactive'
             except:
                 hostStatus = 'Inactive'
+
+            ## Kill any others
+            try:
+                mc.bashReturn('killall -9 raspivid')
+            except:
+                pass
+
+            ## Start
             mc.svControl('start', 'gsPrep')
             return render_template('index.html',
                                    telem_Service = mc.svCheck('telemetry_Service'),
@@ -113,6 +127,14 @@ class VIDEO(object):
                     hostStatus = 'Inactive'
             except:
                 hostStatus = 'Inactive'
+
+            ## Kill any others
+            try:
+                mc.bashReturn('killall -9 raspivid')
+            except:
+                pass
+
+            ## Start
             mc.svControl('start', 'gsPrepII')
             return render_template('index.html',
                                    telem_Service = mc.svCheck('telemetry_Service'),
@@ -135,6 +157,14 @@ class VIDEO(object):
                     hostStatus = 'Inactive'
             except:
                 hostStatus = 'Inactive'
+
+            ## Kill any others
+            try:
+                mc.bashReturn('killall -9 raspivid')
+            except:
+                pass
+
+            ## Start
             mc.svControl('start', 'gsPrepIII')
             return render_template('index.html',
                                    telem_Service = mc.svCheck('telemetry_Service'),

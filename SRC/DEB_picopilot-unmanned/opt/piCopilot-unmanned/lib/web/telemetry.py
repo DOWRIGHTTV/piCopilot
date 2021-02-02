@@ -23,10 +23,8 @@ class TELEMETRY(object):
         @self.telemetry.route('/Telemetry')
         def index():
             return render_template('telemetry/index.html',
-                                   serviceStatus = self.mc.svCheck('telemetry_Service'),
-                                   cacheStatus = self.mc.svCheck('telemetry_cacheFlusher'))
+                                   serviceStatus = self.mc.svCheck('telemetry_Service'))
 ###############################################################################
-
 
 
 
@@ -49,8 +47,7 @@ class TELEMETRY(object):
         @self.telemetry.route('/Telemetry/config-set', methods = ['POST'])
         def telemetrySet():
             return render_template('telemetry/index.html',
-                                   serviceStatus = self.mc.svCheck('telemetry_Service'),
-                                   cacheStatus = self.mc.svCheck('telemetry_cacheFlusher'))
+                                   serviceStatus = self.mc.svCheck('telemetry_Service'))
 
 
         @self.telemetry.route('/Telemetry/Service-Control', methods = ['POST'])
@@ -63,18 +60,29 @@ class TELEMETRY(object):
                 if self.mc.telemetryServiceControl == 'Off':
                     self.mc.svControl('stop', 'telemetry_Service')
 
-                    ## If cacheFlushers running, stop them
-                    if self.mc.svCheck('telemetry_cacheFlusher') == 'RUNNING':
-                        self.mc.svControl('stop', 'telemetry_cacheFlusher')
-                        self.mc.svControl('stop', 'video_cacheFlusher')
-
             ## If the service is not running and we turn on
             else:
                 if self.mc.telemetryServiceControl == 'On':
                     self.mc.svControl('start', 'telemetry_Service')
-                    if self.mc.svCheck('telemetry_cacheFlusher') != 'RUNNING':
-                        self.mc.svControl('start', 'telemetry_cacheFlusher')
 
             return render_template('telemetry/index.html',
-                                   serviceStatus = self.mc.svCheck('telemetry_Service'),
-                                   cacheStatus = self.mc.svCheck('telemetry_cacheFlusher'))
+                                   serviceStatus = self.mc.svCheck('telemetry_Service'))
+
+
+        @self.telemetry.route('/Telemetry/___Service-OFF')
+        def serviceOFF():
+            """Turn the Telemetry Off"""
+            if self.mc.svCheck('telemetry_Service') == 'RUNNING':
+                self.mc.svControl('stop', 'telemetry_Service')
+
+            return render_template('telemetry/index.html',
+                                   serviceStatus = self.mc.svCheck('telemetry_Service'))
+
+        @self.telemetry.route('/Telemetry/___Service-ON')
+        def serviceON():
+            """Turn the Telemetry On"""
+            if self.mc.svCheck('telemetry_Service') != 'RUNNING':
+                self.mc.svControl('start', 'telemetry_Service')
+
+            return render_template('telemetry/index.html',
+                                   serviceStatus = self.mc.svCheck('telemetry_Service'))

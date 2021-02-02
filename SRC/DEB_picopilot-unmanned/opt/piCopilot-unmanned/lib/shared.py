@@ -33,7 +33,7 @@ class Multi(object):
 
     def logSize(self):
         """Return the total size of all logs for mavproxy"""
-        return subprocess.check_output('du -h /opt/unmanned/modules/telemetry/myVehicle/ | tail -n 1 | cut -f1',
+        return subprocess.check_output('du -h /opt/piCopilot-unmanned/modules/telemetry/myVehicle/ | tail -n 1 | cut -f1',
                                        shell = True).decode().strip()
 
 
