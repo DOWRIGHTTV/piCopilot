@@ -99,9 +99,14 @@ piCopilot expects a secured network.  It is not recommended to connect the pipel
 
 ### Performance boosts (Recommended - Required for kBlue)
 For SD card preservation, dphys-swapfile is disabled.  It is preferable to offload any swapping to a USB:
-1. Prepare a USB thumb-drive of ideally at least 8GB in size split evenly on the partitions.
-    - /dev/sda1 should be swap
-    - /dev/sda2 should be ext4
+1. Plug a USB thumb-drive of ideally at least 4GB in size into the Raspberry Pi and then do:
+```
+parted -s /dev/sda mklabel msdos
+parted -s /dev/sda mkpart primary 0% 50%
+parted -s /dev/sda mkpart primary 51% 100%
+mkswap /dev/sda1
+mkfs.ext4 /dev/sda2 -m 0
+```
 
 2. Setup /etc/fstab for mounts:
 ```
@@ -110,19 +115,35 @@ echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab
 echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab
 ```
 
-3. Final steps
-    - Power down the Raspberry Pi
-    - Plugin USB drive and ubertooth
-    - Power on the Raspberry Pi
+3. Turn on swap and storage:
+```
+swapon /dev/sda1
+mount /dev/sda2
+```
+
+4. The ubertooth may now be used for kBlue
 
 
 ### Grafana visualizations (Optional)
 Setup Grafana and visualize your findings
-    - systemctl start grafana-server
-    - Proceed to http://192.168.10.254:3000/login
-    - Login with admin:admin
-    - Change the default Grafana password
-    - A sample dashboard for idrop is waiting on you
+```
+systemctl enable grafana-server
+systemctl start grafana-server
+```
+* Proceed to http://192.168.10.254:3000/login
+* Login with admin:admin
+* Change the default Grafana password if wanted
+* Connect grafana to the postgresql database
+  * Settings
+  * Data Sources
+  * Add Data Source
+    * PostgreSQL
+      * Host     --> localhost:5432
+      * Database --> idrop
+      * User     --> root
+      * Password --> idrop
+      * SSL Mode --> disable
+* A sample dashboard for idrop is waiting on you
 
 ### Tuning kBlue (Optional)
 Benchmark on Raspberry Pi 3 Model B+ as determined by [blRip.py](https://github.com/stryngs/workshops/blob/master/DC28/blRip.py) w/ no print:
