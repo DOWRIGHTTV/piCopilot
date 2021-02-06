@@ -99,7 +99,13 @@ piCopilot expects a secured network.  It is not recommended to connect the pipel
 
 ### Performance boosts (Recommended - Required for kBlue)
 For SD card preservation, dphys-swapfile is disabled.  It is preferable to offload any swapping to a USB:
-1. Plug a USB thumb-drive of ideally at least 4GB in size into the Raspberry Pi and then do:
+1. Become root:
+```
+sudo -s
+# The password is ~~> notraspberry
+```
+
+2. Plug a USB thumb-drive of ideally at least 4GB in size into the Raspberry Pi and then do:
 ```
 parted -s /dev/sda mklabel msdos
 parted -s /dev/sda mkpart primary 0% 50%
@@ -108,25 +114,27 @@ mkswap /dev/sda1
 mkfs.ext4 /dev/sda2 -m 0
 ```
 
-2. Setup /etc/fstab for mounts:
+3. Setup /etc/fstab for mounts:
 ```
 mkdir -p /mnt/usb_storage
 echo '/dev/sda1 swap swap defaults 0 0' >> /etc/fstab
 echo '/dev/sda2 /mnt/usb_storage ext4 noauto,nofail,x-systemd.automount,x-systemd.idle-timeout=2,x-systemd.device-timeout=2' >> /etc/fstab
 ```
 
-3. Turn on swap and storage:
+4. Turn on swap and storage:
 ```
 swapon /dev/sda1
 mount /dev/sda2
 ```
 
-4. The ubertooth may now be used for kBlue
+5. You may now plug in an Ubertooth (Optional)
 
 
 ### Grafana visualizations (Optional)
 Setup Grafana and visualize your findings
 ```
+sudo -s
+# The password is ~~> notraspberry
 systemctl enable grafana-server
 systemctl start grafana-server
 ```
