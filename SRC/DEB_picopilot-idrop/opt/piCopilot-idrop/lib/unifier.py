@@ -4,13 +4,16 @@ import packetEssentials as PE
 import re
 import time
 
+"""
+drop GPS usage here
+"""
+
 class Unify(object):
     """This class acts a singular point of contact for tracking purposes"""
 
     def __init__(self, args, control = None, kBlue = None):        
         self.epoch = None
-        self.lDate = None
-        self.lTime = None
+        self.coord = None ### GPS <<<
 
         ## Set the orig timestamp
         self.origTime = int(time.time())
@@ -31,16 +34,6 @@ class Unify(object):
                 ## Notate driver offset
                 self.PE = PE
                 self.offset = self.PE.drv.drivers(self.iwDriver)
-
-            ## Packet logs
-            self.logDict = {'ids': 0,
-                            'iterCount': 0,
-                            'dhcp': 0,
-                            'probes': 0,
-                            'total': 0}
-        ## kBlue usage
-        else:
-            self.logDict = {'blue': 0}
 
         ## Setup base
         self.baseDir = os.getcwd()
@@ -69,12 +62,6 @@ class Unify(object):
             return None
 
 
-    def logUpdate(self, key):
-        """Increase the count by 1 for a given key"""
-        count = self.logDict.get(key)
-        self.logDict.update({key: count + 1})
-
-
     def times(self):
         """Timestamp function
 
@@ -82,9 +69,12 @@ class Unify(object):
         """
         ### This converts to Wireshark style
         #int(wepCrypto.endSwap('0x' + p.byteRip(f.notdecoded[8:], qty = 8, compress = True)), 16)
+        
+        """
+        Call GPS counter here
+        """
+        
         self.epoch = int(time.time())                                                ## Store the epoch in UTC
-        self.lDate = time.strftime('%Y-%m-%d', time.localtime(self.epoch))           ## Store the date in local tz
-        self.lTime = time.strftime('%H:%M:%S', time.localtime(self.epoch))           ## Store the time in local tz
         self.pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.epoch))   ## Store the sql timestamp for UTC
         self.origStamp = self.origTime
         self.timeMarker = self.epoch

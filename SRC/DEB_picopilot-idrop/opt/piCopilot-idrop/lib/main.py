@@ -13,11 +13,8 @@ class Main(object):
         ## main table gen
         if wireless is True:
             self.cap.db.execute("""
-                                CREATE TABLE IF NOT EXISTS main(pid INT,
-                                                                epoch INTEGER,
-                                                                pi_timestamp TIMESTAMPTZ,
-                                                                date TEXT,
-                                                                time TEXT,
+                                CREATE TABLE IF NOT EXISTS main(pi_timestamp TIMESTAMPTZ,
+                                                                coord TEXT,
                                                                 addr1_oui TEXT,
                                                                 addr1 TEXT,
                                                                 addr2_oui TEXT,
@@ -123,11 +120,8 @@ class Main(object):
 
         ## Insert
         self.cap.db.execute("""
-                            INSERT INTO main (pid,
-                                              epoch,
-                                              pi_timestamp,
-                                              date,
-                                              time,
+                            INSERT INTO main (pi_timestamp,
+                                              coord,
                                               addr1_oui,
                                               addr1,
                                               addr2_oui,
@@ -159,15 +153,9 @@ class Main(object):
                                                 %s,
                                                 %s,
                                                 %s,
-                                                %s,
-                                                %s,
-                                                %s,
                                                 %s);
-                            """, (self.unity.logDict.get('total'),
-                                  self.unity.epoch,
-                                  self.unity.pi_timestamp,
-                                  self.unity.lDate,
-                                  self.unity.lTime,
+                            """, (self.unity.pi_timestamp,
+                                  self.unity.coord,
                                   o1,
                                   packet.addr1,
                                   o2,

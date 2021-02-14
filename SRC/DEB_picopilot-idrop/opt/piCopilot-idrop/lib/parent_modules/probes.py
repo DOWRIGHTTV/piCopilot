@@ -13,15 +13,12 @@ class Probes(object):
 
         ## Create
         dbInstance.db.execute("""
-                                CREATE TABLE IF NOT EXISTS probes(pid INT,
-                                                                    epoch INT,
-                                                                    pi_timestamp TIMESTAMPTZ,
-                                                                    date TEXT,
-                                                                    time TEXT,
-                                                                    subtype TEXT,
-                                                                    addr1 TEXT,
-                                                                    addr2 TEXT,
-                                                                    essid TEXT);
+                                CREATE TABLE IF NOT EXISTS probes(pi_timestamp TIMESTAMPTZ,
+                                                                  coord TEXT,
+                                                                  subtype TEXT,
+                                                                  addr1 TEXT,
+                                                                  addr2 TEXT,
+                                                                  essid TEXT);
                                 """)
 
 

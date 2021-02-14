@@ -21,18 +21,6 @@ def crtlC(cap, unity):
             unity.conBeat.close()
         except:
             print('Could not close heartbeat connection')
-        print('Packets logged:\n')
-        for k, v in unity.logDict.items():
-            print('%s       -- %s' % (k, v))
-        if unity.args.m != 'ids':
-            print('uniques       -- {0}\n'.format(len(unity.seenDict)))
-
-        ## Unload tuples for visual comfort
-        if unity.args.m == 'ids':
-            print('\ntulpleSet dump:')
-            print(len(unity.tupleSet))
-            print(unity.tupleSet.pop())
-            print('\n')
         sys.exit(0)
     return tmp
 

@@ -44,11 +44,8 @@ class Snarf(object):
             self.pStore = False
 
         ## Track unique addr combos
-        self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pid INT,\
-                                                                epoch INTEGER,\
-                                                                pi_timestamp TIMESTAMPTZ,\
-                                                                date TEXT,\
-                                                                time TEXT,\
+        self.cap.db.execute('CREATE TABLE IF NOT EXISTS uniques(pi_timestamp TIMESTAMPTZ,\
+                                                                coord TEXT,\
                                                                 type TEXT,\
                                                                 subtype TEXT,\
                                                                 FCfield TEXT,\
@@ -105,20 +102,16 @@ class Snarf(object):
                     match = True
                 match = True
             if tName is not None:
-                self.sh.bashReturn('echo "INITIAL mark" >> /tmp/MARK')
-
-                print ('our kSeen is {}'.format(self.kSeen))
 
                 ## Avoid 30 second lag on first sighting
                 if self.kSeen is None:
                     self.kSeen = True
-                    self.sh.bashReturn('echo "2nd INITIAL mark" >> /tmp/MARK')
 
                     ## Handle main
                     self.handlerMain(packet)
 
                     ## Notify
-                    print('SNARF!! {0} traffic detected!'.format(tName))
+                    #print('SNARF!! {0} traffic detected!'.format(tName))
 
                     ### verify before trusting hexstr(str())
                     notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
@@ -163,10 +156,7 @@ class Snarf(object):
                     ## Timestamp
                     self.unity.times()
                     timeDelta = self.unity.timeMarker - self.unity.origTime
-                    print ('our delta is {0}'.format(str(timeDelta)))
-                    self.sh.bashReturn('echo "sub mark {0}" >> /tmp/MARK'.format(str(timeDelta)))
                     if timeDelta > 30:
-                        self.sh.bashReturn('echo "EMAIL sub mark {0}" >> /tmp/MARK'.format(str(timeDelta)))
                         ## Reset the counter
                         self.unity.origTime = int(time.time())
 
@@ -203,7 +193,6 @@ class Snarf(object):
 
         As main is the total, only an entry to total is needed to track main
         """
-        self.unity.logUpdate('total')
         self.main.trigger(packet)
 
     ### Move to handler.py
@@ -211,11 +200,9 @@ class Snarf(object):
     def handlerProtocol(self, packet):
         """Handles protocol dissection aspect of logging"""
         if 'dhcp' in self.protocols:
-            if self.dhcp.trigger(packet) == True:
-                self.unity.logUpdate('dhcp')
+            self.dhcp.trigger(packet)
         if 'probes' in self.protocols:
-            if self.probes.trigger(packet) == True:
-                self.unity.logUpdate('probes')
+            self.probes.trigger(packet)
 
 
     def seenTest(self, packet):
@@ -252,11 +239,8 @@ class Snarf(object):
                     fcField = self.unity.PE.conv.symString(packet[Dot11], 'FCfield')
                     try:
                         self.cap.db.execute("""
-                                            INSERT INTO uniques (pid,
-                                                                 epoch,
-                                                                 pi_timestamp,
-                                                                 date,
-                                                                 time,
+                                            INSERT INTO uniques (pi_timestamp,
+                                                                 coord,
                                                                  type,
                                                                  subtype,
                                                                  FCfield,
@@ -272,15 +256,9 @@ class Snarf(object):
                                                                  %s,
                                                                  %s,
                                                                  %s,
-                                                                 %s,
-                                                                 %s,
-                                                                 %s,
                                                                  %s);
-                                            """, (self.unity.logDict.get('total'),
-                                                  self.unity.epoch,
-                                                  self.unity.pi_timestamp,
-                                                  self.unity.lDate,
-                                                  self.unity.lTime,
+                                            """, (self.unity.pi_timestamp,
+                                                  self.unity.coord,
                                                   pType,
                                                   subType,
                                                   fcField,
@@ -328,13 +306,6 @@ class Snarf(object):
                             self.handlerProtocol(packet)
                             if self.pStore is not False:
                                 self.pStore.write(packet)
-
-                            ## stdouts
-                            self.unity.logUpdate('iterCount')
-                            if self.unity.logDict.get('iterCount') == 1000:
-                                #self.cap.con.commit()
-                                print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
-                                self.unity.logDict.update({'iterCount': 0})
                         else:
                             return
                     else:
@@ -348,15 +319,6 @@ class Snarf(object):
                         self.handlerProtocol(packet)
                         if self.pStore is not False:
                             self.pStore.write(packet)
-
-                        ## stdouts
-                        self.unity.logUpdate('iterCount')
-                        if self.unity.logDict.get('iterCount') == 1000:
-
-                            ### Make this x/y style where x == stored and y == total
-
-                            print('Total packets logged: {0}'.format(self.unity.logDict.get('total')))
-                            self.unity.logDict.update({'iterCount': 0})
                     else:
                         return
             else:

@@ -12,11 +12,8 @@ class Dhcp(object):
 
         ## Create
         dbInstance.db.execute("""
-                              CREATE TABLE IF NOT EXISTS dhcp(pid INT,
-                                                              epoch INT,
-                                                              pi_timestamp TIMESTAMPTZ,
-                                                              date TEXT,
-                                                              time TEXT,
+                              CREATE TABLE IF NOT EXISTS dhcp(pi_timestamp TIMESTAMPTZ,
+                                                              coord TEXT,
                                                               addr1 TEXT,
                                                               addr2 TEXT,
                                                               addr3 TEXT,
