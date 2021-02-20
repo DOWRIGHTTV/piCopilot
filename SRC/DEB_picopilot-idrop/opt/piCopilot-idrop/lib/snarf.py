@@ -145,7 +145,7 @@ class Snarf(object):
                     print('SNARF!! {0} traffic detected!'.format(tName))
 
                     ### verify before trusting hexstr(str())
-                    notDecoded = hexstr(str(packet.notdecoded), onlyhex=1).split(' ')
+                    notDecoded = hexstr(str(packet.notdecoded), onlyhex = 1).split(' ')
 
                     try:
                         fSig = -(256 - int(notDecoded[self.unity.offset + 3], 16))

@@ -3,17 +3,22 @@ import netaddr
 import packetEssentials as PE
 import re
 import time
+from lib.location import Location
 
 """
-drop GPS usage here
+server 127.127.28.0 minpoll 3 maxpoll 3
+fudge 127.127.28.0 time1 .15 flag1 1 refid GPS
 """
 
 class Unify(object):
     """This class acts a singular point of contact for tracking purposes"""
 
-    def __init__(self, args, control = None, kBlue = None):        
+    def __init__(self, args, control = None, kBlue = None):
         self.epoch = None
-        self.coord = None ### GPS <<<
+        self.coord = None
+        self.loc = Location()
+
+        ## Verify GPS if enabled
 
         ## Set the orig timestamp
         self.origTime = int(time.time())
@@ -69,11 +74,8 @@ class Unify(object):
         """
         ### This converts to Wireshark style
         #int(wepCrypto.endSwap('0x' + p.byteRip(f.notdecoded[8:], qty = 8, compress = True)), 16)
-        
-        """
-        Call GPS counter here
-        """
-        
+
+        self.coord = self.loc.getCoord()
         self.epoch = int(time.time())                                                ## Store the epoch in UTC
         self.pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.epoch))   ## Store the sql timestamp for UTC
         self.origStamp = self.origTime

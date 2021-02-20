@@ -10,3 +10,6 @@ systemctl unmask hostapd.service
 
 ## Disable again -- Bug fix?
 systemctl disable hostapd
+
+## GPS
+pip3 install /opt/storage_piCopilot/gpsd-py3-0.3.0.tar.gz

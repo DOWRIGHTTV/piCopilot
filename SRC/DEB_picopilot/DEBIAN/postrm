@@ -5,3 +5,4 @@ systemctl start supervisor
 
 ## Cleanup
 rm -rf /opt/piCopilot
+rm -rf /opt/storage_piCopilot

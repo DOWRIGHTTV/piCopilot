@@ -166,7 +166,7 @@ With the limited horsepower of a Raspberry Pi, any shortcuts we can take are vit
 aa:bb:cc:dd:ee:ff
 ```
 
-#### Unmanned Vehicle Operations (Optional)
+### Unmanned Vehicle Operations (Optional)
 The picopilot-unmanned package has been pre-installed as part of the 20200824 release.  In an effort to make the best of both idrop and the unmanned platform in a single image, the decision was made to have the controller running -- but none of the unmanned core services turned on.  The following files are of interest to anyone who wants to have the core services turned on at boot:
 * /etc/supervisor/conf.d/gsPrep.conf
 * /etc/supervisor/conf.d/motionPrep.conf
@@ -176,11 +176,44 @@ piCopilot has been tested and verified with the Pixhawk IMU.  The unmanned packa
 * http://qgroundcontrol.com/
 * https://ardupilot.org/planner/
 
-#### Connecting piCopilot to the Internet (Optional)
+### Connecting piCopilot to the Internet (Optional)
 * piCopilot wants to be on a 192.168.10.254/24
 * Modify /etc/wpa_supplicant/wpa_supplicant.conf accordingly
 * Remove the # in /etc/network/interfaces.d/wlan0
 * Give /etc/resolv.conf a nameserver
+
+### Upgrading (Optional)
+* New image releases can be sporadic
+* Interim updates are maintained by the DEBs folder
+* Let us determine what versions came with our image:
+```
+dpkg --list | grep picopilot
+```
+* If the numbers above are lower than the files in DEBs, you have an available upgrade.
+* It is recommended to purge piCopilot from the system prior to any upgrade.
+* Perform a reboot, ensure there are no .deb files within the current directory and then do:
+```
+apt-get purge -y picopilot*
+```
+* Once complete verify that /opt now contains only 2 folders; pigpio and vc.
+```
+git clone https://github.com/stryngs/piCopilot.git
+cd piCopilot/DEBs
+dpkg -i *.deb
+```
+* Prep the database
+    * Database schema changes may occur during upgrades and without warning
+    * Backup the data if it matters
+    * DROP tables is our friend:
+    ```
+    psql idrop
+    DROP TABLE IF EXISTS blue;
+    DROP TABLE IF EXISTS dhcp;
+    DROP TABLE IF EXISTS main;
+    DROP TABLE IF EXISTS probes;
+    DROP TABLE IF EXISTS uniques;
+    \q
+    ```
 
 ### Known bug(s)
 * For the page on /, the idrop Service gets confused by the presence of kBlue and how sh.sysMode is used.  When enabling kBlue and returning to the main menu, the idrop Service will now read as kBlue.  This will be worked out in later releases.  To force it proper, cycle the idrop service off and then back on.  It will correct by virtue of sh.sysMode flipping through the original idrop logic.
@@ -189,8 +222,8 @@ piCopilot has been tested and verified with the Pixhawk IMU.  The unmanned packa
 ### Up next
 * Further kSnarf and kBlue method integrations.
 * OUI integrations for kBlue module.
-* A confirmation for nicPREP prior to firing.
-  * The current workaround is to erase piCopilot browser tab history after firing nicPREP.  This will ensure you do not accidently re-fire it during operational use.
+* A confirmation for nicPREP or timeSYNC prior to firing.
+  * The current workaround is to erase piCopilot browser tab history after firing nicPREP or timeSYNC.  This will ensure you do not accidently re-fire it during operational use.
 
 
 ### Contacting support

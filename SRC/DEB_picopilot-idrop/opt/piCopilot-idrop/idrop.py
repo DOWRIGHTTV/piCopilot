@@ -24,7 +24,8 @@ def index():
                                system_Mode = 'None',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                               system_Time = sh.bashReturn("date"))
     if sh.sysMode == 'k9':
         return render_template('index.html',
                                kBlue_Service = sh.rlCheck('kBlue'),
@@ -32,7 +33,8 @@ def index():
                                system_Mode = sh.rlCheck('k9'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                               system_Time = sh.bashReturn("date"))
     if sh.sysMode == 'kSnarfPsql':
         return render_template('index.html',
                                kBlue_Service = sh.rlCheck('kBlue'),
@@ -40,7 +42,8 @@ def index():
                                system_Mode = sh.rlCheck('kSnarfPsql'),
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                               system_Time = sh.bashReturn("date"))
     if sh.sysMode == 'Off':
         return render_template('index.html',
                                kBlue_Service = sh.rlCheck('kBlue'),
@@ -48,7 +51,8 @@ def index():
                                system_Mode = 'Off',
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                               system_Time = sh.bashReturn("date"))
 
     if sh.sysMode == 'kBlue':
         return render_template('index.html',
@@ -57,7 +61,8 @@ def index():
                                system_Mode = sh.sysMode,
                                system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                                query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                               system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                               system_Time = sh.bashReturn("date"))
 
     ## Unexpected prep
     return render_template('index.html',
@@ -66,7 +71,8 @@ def index():
                            system_Mode = sh.sysMode,
                            system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
                            query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
-                           system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"))
+                           system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                           system_Time = sh.bashReturn("date"))
 ###############################################################################
 
 
@@ -83,6 +89,19 @@ def jquery():
 @app.route('/NICprep')
 def nicPrep():
     sh.rlControl('start', 'nicPrep')
+
+@app.route('/TIMEsync')
+def timeSync():
+    os.system('/bin/bash /opt/piCopilot-scripts/timeSync.sh')
+    return render_template('index.html',
+                           kBlue_Service = sh.rlCheck('kBlue'),
+                           system_Service = sh.sysMode,
+                           system_Mode = 'None',
+                           system_Channel = sh.bashReturn("iwlist wlan1mon channel | grep Current | awk '{print $5}' | cut -d\) -f1| tail -n 1"),
+                           query_Exports = sh.bashReturn("du -h /var/lib/postgresql/11/main | tail -n 1 | awk '{print $1}'"),
+                           system_hddAvail = sh.bashReturn("df -h | grep '/dev/root' | awk '{print $4}'"),
+                           system_Time = sh.bashReturn("date"))
+    
 ###############################################################################
 
 if __name__ == '__main__':

@@ -236,7 +236,9 @@ class Blue(object):
 
     def pgsqlFilter(self):
         def snarf(packet):
-            epoch, lDate, lTime, pi_timestamp = self.timer()
+            self.blinder.unity.times()
+            print(self.blinder.unity.pi_timestamp)
+            print(self.blinder.unity.coord)
 
             ## Only test if known MAC field(s) exists
             if self.blinder.choiceMaker(packet) is True:
@@ -251,10 +253,8 @@ class Blue(object):
 
                         ## Update the db
                         self.db.execute("""
-                                        INSERT INTO blue (epoch,
-                                                          pi_timestamp,
-                                                          date,
-                                                          time,
+                                        INSERT INTO blue (pi_timestamp,
+                                                          coord,
                                                           parent,
                                                           adva,
                                                           inita,
@@ -268,13 +268,9 @@ class Blue(object):
                                                              %s,
                                                              %s,
                                                              %s,
-                                                             %s,
-                                                             %s,
                                                              %s);
-                                                 """, (epoch,
-                                                       pi_timestamp,
-                                                       lDate,
-                                                       lTime,
+                                                 """, (self.blinder.unity.pi_timestamp,
+                                                       self.blinder.unity.coord,
                                                        self.blinder.bTuple[0],
                                                        self.blinder.bTuple[1],
                                                        self.blinder.bTuple[2],
@@ -296,10 +292,8 @@ class Blue(object):
 
             ## db prep
             db.execute("""
-                       CREATE TABLE IF NOT EXISTS blue(epoch REAL,
-                                                       pi_timestamp TIMESTAMPTZ,
-                                                       date TEXT,
-                                                       time TEXT,
+                       CREATE TABLE IF NOT EXISTS blue(pi_timestamp TIMESTAMPTZ,
+                                                       coord TEXT,
                                                        parent TEXT,
                                                        adva TEXT,
                                                        inita TEXT,
@@ -314,14 +308,6 @@ class Blue(object):
         dbName = 'idrop'
 
         return (con, db, dbName)
-
-
-    def timer(self):
-        epoch = int(time.time())                                                ## Store the epoch in UTC
-        lDate = time.strftime('%Y-%m-%d', time.localtime(epoch))                ## Store the date in local tz
-        lTime = time.strftime('%H:%M:%S', time.localtime(epoch))                ## Store the time in local tz
-        pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(epoch))   ## Store the sql timestamp for UTC
-        return epoch, lDate, lTime, pi_timestamp
 
 
     def main(self):

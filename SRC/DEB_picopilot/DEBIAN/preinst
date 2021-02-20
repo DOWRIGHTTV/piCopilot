@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 
+## Disable GPS and NTP
+systemctl disable gpsd
+systemctl disable gpsd.socket
+systemctl disable ntp
+
 ## Stop Supervisor daemon
 systemctl stop supervisor
 
 ## Ensure hostapd is disabled
 systemctl disable hostapd
-
-## Add swap
-systemctl enable dphys-swapfile 2>/dev/null
 
 ## Prep the AP
 cat <<EOF > /etc/default/hostapd
