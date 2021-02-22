@@ -2,7 +2,6 @@ import logging
 import time
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-from lib.parent_modules.dhcp import Dhcp
 from lib.parent_modules.probes import Probes
 from lib.main import Main
 from lib.notifier import Alert
@@ -27,12 +26,7 @@ class Snarf(object):
         print ('Using pkt silent time of:\n{0}\n'.format(self.unity.seenMaxTimer))
 
         if sProtocol is not None:
-            self.protocols = [i for i in sProtocol]
-            if 'dhcp' in self.protocols:
-                self.dhcp = Dhcp(self.cap, self.unity)
-                #print('added dhcp')
-            if 'probes' in self.protocols:
-                self.probes = Probes(self.cap, self.unity)
+            self.probes = Probes(self.cap, self.unity)
                 #print('added probes')
 
         ## Deal with PCAP storage
@@ -182,7 +176,7 @@ class Snarf(object):
         """
         if self.unity.args.e is not None:
             if 'beacon' in self.unity.args.e:
-                if packet.haslayer(Dot11Beacon):
+                if packet.haslayer(Dot11Beacon): ## Should be this plus other layers...? Will have to dissect some frames, Perhaps Dot11Beacon + is needed.
                     return True
         return False
 
@@ -198,11 +192,7 @@ class Snarf(object):
     ### Move to handler.py
     ### Break this down for a speed boost
     def handlerProtocol(self, packet):
-        """Handles protocol dissection aspect of logging"""
-        if 'dhcp' in self.protocols:
-            self.dhcp.trigger(packet)
-        if 'probes' in self.protocols:
-            self.probes.trigger(packet)
+        self.probes.trigger(packet)
 
 
     def seenTest(self, packet):
@@ -267,7 +257,8 @@ class Snarf(object):
                                                   packet.addr3,
                                                   packet.addr4))
                     except Exception as E:
-                        print (E)
+                        pass
+                        #print (E)
 
                 return False
 
@@ -340,7 +331,7 @@ class Snarf(object):
             self.pCount += 1
             self.tCount += 1
             if self.pCount == 100:
-                print('{0} frames logged'.format(self.tCount))
+                #print('{0} frames logged'.format(self.tCount))
                 self.pCount = 0
         return snarf
 

@@ -76,7 +76,7 @@ class Unify(object):
         #int(wepCrypto.endSwap('0x' + p.byteRip(f.notdecoded[8:], qty = 8, compress = True)), 16)
 
         self.coord = self.loc.getCoord()
-        self.epoch = int(time.time())                                                ## Store the epoch in UTC
+        self.epoch = int(time.time())                                                     ## Store the epoch in UTC
         self.pi_timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.epoch))   ## Store the sql timestamp for UTC
         self.origStamp = self.origTime
         self.timeMarker = self.epoch

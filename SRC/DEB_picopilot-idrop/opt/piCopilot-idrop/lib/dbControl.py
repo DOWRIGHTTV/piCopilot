@@ -36,7 +36,6 @@ class Builder(object):
 
                 ## Test for wipe
                 if self.unity.args.wipe is True:
-                    self.db.execute('DROP TABLE IF EXISTS dhcp;')
                     self.db.execute('DROP TABLE IF EXISTS main;')
                     self.db.execute('DROP TABLE IF EXISTS probes;')
                     self.db.execute('DROP TABLE IF EXISTS uniques;')
